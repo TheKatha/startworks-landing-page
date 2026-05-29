@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>STARTWORKS Technologies</title>
+    <script type="text/javascript">
+      // Single Page Apps for GitHub Pages
+      // MIT License
+      // https://github.com/rafgraph/spa-github-pages
+      // This script checks to see if a redirect is present in the query string,
+      // converts it back into the correct url and adds it to the
+      // browser's history using window.history.replaceState.
+      var pathSegmentsToKeep = 1; // Set to 1 if deploying to username.github.io/repo-name/
+
+      var l = window.location;
+      
+      // Determine if we are on localhost or username.github.io/repo-name
+      // If localhost, we don't keep any path segments.
+      if (l.hostname === 'localhost' || l.hostname === '127.0.0.1') {
+        pathSegmentsToKeep = 0;
+      } else {
+        // For github pages: the path has the repository name (e.g. /the_katha or /startworks)
+        // Usually, the repo name is the first segment.
+        pathSegmentsToKeep = 1;
+      }
+
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') +
+        '/?p=' + l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

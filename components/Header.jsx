@@ -48,7 +48,7 @@ export const Header = () => {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src="/Startworks Logo.avif" alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
+            <img src={`${import.meta.env.BASE_URL}Startworks Logo.avif`} alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
             <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               STARTWORKS
             </span>

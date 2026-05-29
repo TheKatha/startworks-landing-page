@@ -39,7 +39,7 @@ export const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <img src="/Startworks Logo.avif" alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
+              <img src={`${import.meta.env.BASE_URL}Startworks Logo.avif`} alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
               <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
                 STARTWORKS
               </h3>

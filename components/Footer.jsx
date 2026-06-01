@@ -38,7 +38,7 @@ export const Footer = () => {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center mb-4">
-              <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-mode.png' : 'Startworks-Logo.jpg'}`} alt="STARTWORKS" className={`h-20 object-contain ${theme === 'light' ? 'mix-blend-multiply' : ''}`} />
+              <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-cropeed.png' : 'light-logo-cropped.png'}`} alt="STARTWORKS" className={`object-contain transition-all duration-300 ${theme === 'dark' ? 'h-14' : 'h-10'}`} />
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Building transformative technology solutions with expertise and vision.

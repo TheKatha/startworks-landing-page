@@ -48,7 +48,7 @@ export const Header = () => {
         <div className="flex h-20 items-center justify-between">
           {/* Logo */}
           <button onClick={() => { navigate('/'); setTimeout(() => { const hero = document.getElementById('hero'); if (hero) hero.scrollIntoView({ behavior: 'smooth' }); else window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100); }} className="flex items-center cursor-pointer">
-            <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-mode.png' : 'Startworks-Logo.jpg'}`} alt="STARTWORKS" className={`h-16 md:h-20 object-contain ${theme === 'light' ? 'mix-blend-multiply' : ''}`} />
+            <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-cropeed.png' : 'light-logo-cropped.png'}`} alt="STARTWORKS" className={`object-contain transition-all duration-300 ${theme === 'dark' ? 'h-12 md:h-14' : 'h-8 md:h-10'}`} />
           </button>
 
           {/* Desktop Navigation */}

@@ -1,27 +1,26 @@
 import React from 'react';
 import { Linkedin, Mail, Instagram, Youtube } from 'lucide-react';
+import { useTheme } from '../context/ThemeProvider';
 
 export const Footer = () => {
+  const { theme } = useTheme();
   const currentYear = new Date().getFullYear();
 
   const footerLinks = {
     company: [
       { name: 'About Us', href: '#about' },
       { name: 'Our Team', href: '#team' },
-      { name: 'Advisors', href: '#advisors' },
       { name: 'Careers', href: '#contact' }
     ],
     products: [
       { name: 'Equibudx', href: '#equibudx' },
-      { name: 'Solutions', href: '#about' },
-      { name: 'Case Studies', href: '#contact' },
-      { name: 'Documentation', href: '#contact' }
+      { name: 'Solutions', href: '#services' },
+      { name: 'Case Studies', href: '#resources' },
+      { name: 'Documentation', href: '#resources' }
     ],
     resources: [
-      { name: 'Blog', href: '#' },
-      { name: 'Support', href: '#contact' },
-      { name: 'Privacy Policy', href: '#' },
-      { name: 'Terms of Service', href: '#' }
+      { name: 'Blog', href: '#resources' },
+      { name: 'Support', href: '#contact' }
     ]
   };
 
@@ -38,11 +37,8 @@ export const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center space-x-2 mb-4">
-              <img src={`${import.meta.env.BASE_URL}Startworks Logo.avif`} alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-                STARTWORKS
-              </h3>
+            <div className="flex items-center mb-4">
+              <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-mode.png' : 'Startworks-Logo.jpg'}`} alt="STARTWORKS" className={`h-20 object-contain ${theme === 'light' ? 'mix-blend-multiply' : ''}`} />
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               Building transformative technology solutions with expertise and vision.
@@ -125,7 +121,7 @@ export const Footer = () => {
               © {currentYear} STARTWORKS TECHNOLOGIES PRIVATE LIMITED. All rights reserved.
             </p>
             <p className="text-sm text-muted-foreground">
-              Proudly building <span className="text-blue-600 font-medium">Equibudx</span>
+              Proudly building <a href="https://equibudx.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-medium hover:underline">Equibudx</a>
             </p>
           </div>
         </div>

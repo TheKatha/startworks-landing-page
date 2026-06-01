@@ -45,14 +45,11 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img src={`${import.meta.env.BASE_URL}Startworks Logo.avif`} alt="STARTWORKS Logo" className="h-8 w-8 object-contain rounded" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-              STARTWORKS
-            </span>
-          </Link>
+          <button onClick={() => { navigate('/'); setTimeout(() => { const hero = document.getElementById('hero'); if (hero) hero.scrollIntoView({ behavior: 'smooth' }); else window.scrollTo({ top: 0, behavior: 'smooth' }); }, 100); }} className="flex items-center cursor-pointer">
+            <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-mode.png' : 'Startworks-Logo.jpg'}`} alt="STARTWORKS" className={`h-16 md:h-20 object-contain ${theme === 'light' ? 'mix-blend-multiply' : ''}`} />
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6 lg:space-x-8">

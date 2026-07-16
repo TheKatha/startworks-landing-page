@@ -93,17 +93,6 @@ export const Services = () => {
         { title: 'Value-Driven & Cost-Effective Model', desc: 'Through our offshore/onshore model, we offer top-tier AI talent and results at competitive pricing—delivering high ROI.' }
       ]
     },
-    genai: {
-      title: 'Generative AI',
-      subtitle: 'Bring your ideas to life using cutting-edge AI/ML models that enhance creativity, automation, and user engagement.',
-      icon: Sparkles,
-      features: [
-        { title: 'Custom Model Design & Deployment', desc: 'We build customized generative pipelines and model fine-tuning processes tailored to your specific domain context.' },
-        { title: 'Scalable Model Production', desc: 'Optimize open-source or proprietary models (LLMs) to serve low-latency requests in enterprise production environments.' },
-        { title: 'Rigorous Validation & Testing', desc: 'Evaluate generative system outputs for quality, bias, hallucination mitigation, and alignment with guardrails.' },
-        { title: 'Ongoing Model Maintenance', desc: 'We establish frameworks to monitor and retrain models to prevent degradation, keeping performance strong over time.' }
-      ]
-    },
     product: {
       title: 'Product building',
       subtitle: 'We build smart, reliable data products end-to-end—with quality, usability, and fast feedback at their core.',
@@ -136,7 +125,6 @@ export const Services = () => {
     { id: 'governance', label: 'AI Governance & Training', icon: ShieldCheck },
     { id: 'analytics', label: 'AI-Powered Data Analytics', icon: LineChart },
     { id: 'consulting', label: 'AI-Consulting', icon: MessageSquareCode },
-    { id: 'genai', label: 'Generative AI', icon: Sparkles },
     { id: 'product', label: 'Product building', icon: Cpu },
     { id: 'cloud', label: 'Cloud Data Engineering', icon: Database }
   ];

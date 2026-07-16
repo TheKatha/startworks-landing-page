@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
-import { Database, LineChart, MessageSquareCode, Sparkles, Cpu, ChevronRight } from 'lucide-react';
+import { Database, LineChart, MessageSquareCode, Sparkles, Cpu, ChevronRight, ShieldCheck } from 'lucide-react';
 
 export const Services = () => {
   const [activeTab, setActiveTab] = useState('analytics');
@@ -70,6 +70,21 @@ export const Services = () => {
         { title: 'Data Engineering Pipelines', desc: 'We create robust pipelines that consolidate, clean, and transform data from on-premise and cloud sources, delivering reliable data.' },
         { title: 'Master Data Management', desc: 'We establish a single source of truth by linking and governing critical data across systems for real-time, trusted insights.' }
       ]
+    },
+    aigovernance: {
+      title: 'AI Governance',
+      subtitle: 'Comprehensive governance, readiness, security, and compliance frameworks to ensure your AI initiatives are safe, responsible, and effective.',
+      icon: ShieldCheck,
+      features: [
+        { title: 'Readiness Assessment', desc: 'Evaluate your organization\'s preparedness for AI adoption across infrastructure, data, and culture.' },
+        { title: 'Governance for General AI Readiness', desc: 'Establish robust frameworks and policies to guide responsible and effective general AI deployment.' },
+        { title: 'Compliance to Follow', desc: 'Ensure adherence to industry standards, regulations, and legal requirements for AI systems.' },
+        { title: 'Security to Consider for Copilot', desc: 'Address specific security vulnerabilities and data privacy concerns when integrating Copilot tools.' },
+        { title: 'Governance for Copilot Chat', desc: 'Define usage guidelines, data boundaries, and monitoring protocols for Copilot Chat.' },
+        { title: 'Governance for Copilot Agent', desc: 'Implement control mechanisms and accountability structures for autonomous Copilot agents.' },
+        { title: 'Security Considerations for Custom AI', desc: 'Design secure architectures and threat mitigation strategies tailored to your custom AI models.' },
+        { title: 'Governance for Custom Open Source AI solutions', desc: 'Manage risks, licensing, and ethical implications associated with integrating open source AI solutions.' }
+      ]
     }
   };
 
@@ -78,7 +93,8 @@ export const Services = () => {
     { id: 'consulting', label: 'AI-Consulting', icon: MessageSquareCode },
     { id: 'genai', label: 'Generative AI', icon: Sparkles },
     { id: 'product', label: 'Product building', icon: Cpu },
-    { id: 'cloud', label: 'Cloud Data Engineering', icon: Database }
+    { id: 'cloud', label: 'Cloud Data Engineering', icon: Database },
+    { id: 'aigovernance', label: 'AI Governance', icon: ShieldCheck }
   ];
 
   const ActiveIcon = tabsContent[activeTab].icon;

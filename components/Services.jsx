@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
-import { Database, LineChart, MessageSquareCode, Sparkles, Cpu, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Target, Bot, BookOpen, Cpu, ShieldCheck, ChevronRight, Database, LineChart, MessageSquareCode, Sparkles } from 'lucide-react';
 
 export const Services = () => {
-  const [activeTab, setActiveTab] = useState('analytics');
+  const [activeTab, setActiveTab] = useState('strategy');
 
   useEffect(() => {
     const handleSelectTab = (event) => {
@@ -16,6 +16,61 @@ export const Services = () => {
   }, []);
 
   const tabsContent = {
+    strategy: {
+      title: 'AI Strategy & Assessment',
+      subtitle: 'Identify high-ROI use cases and build customized roadmaps for AI adoption and integration.',
+      icon: Target,
+      features: [
+        { title: 'AI Opportunity Assessment', desc: 'Identify high-ROI use cases for your business and evaluate readiness.' },
+        { title: 'AI Strategy', desc: 'Build customized roadmaps for AI adoption and seamless integration.' },
+        { title: 'Feasibility Analysis', desc: 'Evaluate data readiness, infrastructure, and potential roadblocks.' },
+        { title: 'Implementation Planning', desc: 'Define timelines, resources, and success metrics for AI projects.' }
+      ]
+    },
+    agents: {
+      title: 'Specialized AI Agents',
+      subtitle: 'Deploy intelligent autonomous agents to handle specific domain workflows across your organization.',
+      icon: Bot,
+      features: [
+        { title: 'HR Agent', desc: 'Answers employee questions, manages leave balances, policies, and payroll inquiries.' },
+        { title: 'Sales Agent', desc: 'Qualifies leads automatically, books meetings, and generates sales proposals.' },
+        { title: 'Procurement Agent', desc: 'Compares quotations, negotiates pricing, and raises purchase requests.' },
+        { title: 'Finance & Legal Agents', desc: 'Handles expense auditing, invoice validation, contract review, and risk detection.' }
+      ]
+    },
+    knowledge: {
+      title: 'Internal Knowledge AI',
+      subtitle: 'One of our highest-value offerings. Employees can instantly ask questions and get accurate answers from company documents.',
+      icon: BookOpen,
+      features: [
+        { title: 'Instant Answers', desc: 'Employees get instant answers to questions like "What\'s our reimbursement policy?"' },
+        { title: 'Document Integration', desc: 'Securely connects to PDFs, SOPs, Policies, SharePoint, Google Drive, and Confluence.' },
+        { title: 'Enhanced Productivity', desc: 'Eliminates hours spent searching through fragmented company documents and wikis.' },
+        { title: 'Secure & Private', desc: 'Ensures company data remains confidential and perfectly access-controlled.' }
+      ]
+    },
+    automation: {
+      title: 'AI Automation & Analytics',
+      subtitle: 'Streamline repetitive tasks with intelligent automation and turn raw data into reliable, real-time insights.',
+      icon: Cpu,
+      features: [
+        { title: 'Workflow Automation', desc: 'Streamline repetitive tasks with intelligent automation and RPA.' },
+        { title: 'Data Analytics', desc: 'Turn raw data into reliable, real-time insights with smart dashboards.' },
+        { title: 'Predictive Modeling', desc: 'Forecast trends and behaviors to drive proactive business decisions.' },
+        { title: 'Process Optimization', desc: 'Continuously improve operational efficiency through AI-driven insights.' }
+      ]
+    },
+    governance: {
+      title: 'AI Governance & Training',
+      subtitle: 'Ensure your AI initiatives are safe, responsible, and compliant while equipping your workforce with necessary skills.',
+      icon: ShieldCheck,
+      features: [
+        { title: 'AI Governance Frameworks', desc: 'Ensure your AI initiatives are safe, responsible, and fully compliant.' },
+        { title: 'Team Training & Upskilling', desc: 'Equip your workforce with the necessary skills to leverage AI effectively.' },
+        { title: 'Security & Compliance', desc: 'Adhere to industry standards and mitigate AI-related risks.' },
+        { title: 'Continuous Monitoring', desc: 'Maintain model performance, fairness, and accuracy over time.' }
+      ]
+    },
     analytics: {
       title: 'AI-Powered Data Analytics',
       subtitle: 'We turn raw data into reliable, real-time insight with cleaned pipelines, smart dashboards, and optimized reporting—so you can make decisions that drive growth.',
@@ -70,31 +125,20 @@ export const Services = () => {
         { title: 'Data Engineering Pipelines', desc: 'We create robust pipelines that consolidate, clean, and transform data from on-premise and cloud sources, delivering reliable data.' },
         { title: 'Master Data Management', desc: 'We establish a single source of truth by linking and governing critical data across systems for real-time, trusted insights.' }
       ]
-    },
-    aigovernance: {
-      title: 'AI Governance',
-      subtitle: 'Comprehensive governance, readiness, security, and compliance frameworks to ensure your AI initiatives are safe, responsible, and effective.',
-      icon: ShieldCheck,
-      features: [
-        { title: 'Readiness Assessment', desc: 'Evaluate your organization\'s preparedness for AI adoption across infrastructure, data, and culture.' },
-        { title: 'Governance for General AI Readiness', desc: 'Establish robust frameworks and policies to guide responsible and effective general AI deployment.' },
-        { title: 'Compliance to Follow', desc: 'Ensure adherence to industry standards, regulations, and legal requirements for AI systems.' },
-        { title: 'Security to Consider for Copilot', desc: 'Address specific security vulnerabilities and data privacy concerns when integrating Copilot tools.' },
-        { title: 'Governance for Copilot Chat', desc: 'Define usage guidelines, data boundaries, and monitoring protocols for Copilot Chat.' },
-        { title: 'Governance for Copilot Agent', desc: 'Implement control mechanisms and accountability structures for autonomous Copilot agents.' },
-        { title: 'Security Considerations for Custom AI', desc: 'Design secure architectures and threat mitigation strategies tailored to your custom AI models.' },
-        { title: 'Governance for Custom Open Source AI solutions', desc: 'Manage risks, licensing, and ethical implications associated with integrating open source AI solutions.' }
-      ]
     }
   };
 
   const tabsList = [
+    { id: 'strategy', label: 'AI Strategy & Assessment', icon: Target },
+    { id: 'agents', label: 'Specialized AI Agents', icon: Bot },
+    { id: 'knowledge', label: 'Internal Knowledge AI', icon: BookOpen },
+    { id: 'automation', label: 'AI Automation & Analytics', icon: Cpu },
+    { id: 'governance', label: 'AI Governance & Training', icon: ShieldCheck },
     { id: 'analytics', label: 'AI-Powered Data Analytics', icon: LineChart },
     { id: 'consulting', label: 'AI-Consulting', icon: MessageSquareCode },
     { id: 'genai', label: 'Generative AI', icon: Sparkles },
     { id: 'product', label: 'Product building', icon: Cpu },
-    { id: 'cloud', label: 'Cloud Data Engineering', icon: Database },
-    { id: 'aigovernance', label: 'AI Governance', icon: ShieldCheck }
+    { id: 'cloud', label: 'Cloud Data Engineering', icon: Database }
   ];
 
   const ActiveIcon = tabsContent[activeTab].icon;
@@ -107,13 +151,12 @@ export const Services = () => {
             Our Services
           </div>
           <h2 className="text-3xl lg:text-5xl font-bold mb-6">
-            Empowering businesses with{' '}
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              smart solutions
+              AI Transformation
             </span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Explore our specific capabilities across data, product engineering, and cutting-edge artificial intelligence.
+            Help businesses become AI-first organizations by identifying, implementing, and managing AI solutions that deliver measurable business value.
           </p>
         </div>
 

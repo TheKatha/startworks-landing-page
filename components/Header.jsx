@@ -23,11 +23,7 @@ export const Header = () => {
 
   const selectServiceTab = (tabId) => {
     setMobileMenuOpen(false);
-    navigate('/services');
-    setTimeout(() => {
-      const event = new CustomEvent('select-service-tab', { detail: { tabId } });
-      window.dispatchEvent(event);
-    }, 200);
+    navigate(`/services/${tabId}`);
   };
 
   const toggleMobileDropdown = (key) => {
@@ -66,19 +62,19 @@ export const Header = () => {
                 <div className="flex flex-row p-2">
                   <div className="w-1/2 flex flex-col">
                     <div className="w-full text-left px-4 py-2 text-sm text-foreground/80 font-semibold cursor-default">AI Transformation</div>
-                    <button onClick={() => selectServiceTab('strategy')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Strategy & Assessment</button>
-                    <button onClick={() => selectServiceTab('agents')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Specialized AI Agents</button>
-                    <button onClick={() => selectServiceTab('knowledge')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Internal Knowledge AI</button>
-                    <button onClick={() => selectServiceTab('automation')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Automation & Analytics</button>
-                    <button onClick={() => selectServiceTab('governance')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Governance & Training</button>
+                    <button onClick={() => selectServiceTab('ai-strategy-assessment')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Strategy & Assessment</button>
+                    <button onClick={() => selectServiceTab('specialized-ai-agents')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Specialized AI Agents</button>
+                    <button onClick={() => selectServiceTab('internal-knowledge-ai')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Internal Knowledge AI</button>
+                    <button onClick={() => selectServiceTab('ai-automation-analytics')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Automation & Analytics</button>
+                    <button onClick={() => selectServiceTab('ai-governance-training')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI Governance & Training</button>
                   </div>
                   
                   <div className="w-1/2 flex flex-col border-l border-border/40 pl-2">
                     <div className="w-full text-left px-4 py-2 text-sm text-foreground/80 font-semibold cursor-default">Core Services</div>
-                    <button onClick={() => selectServiceTab('analytics')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI-Powered Data Analytics</button>
-                    <button onClick={() => selectServiceTab('consulting')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI-Consulting</button>
-                    <button onClick={() => selectServiceTab('product')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Product building</button>
-                    <button onClick={() => selectServiceTab('cloud')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Cloud Data Engineering</button>
+                    <button onClick={() => selectServiceTab('ai-powered-data-analytics')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI-Powered Data Analytics</button>
+                    <button onClick={() => selectServiceTab('ai-consulting')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">AI-Consulting</button>
+                    <button onClick={() => selectServiceTab('product-building')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Product building</button>
+                    <button onClick={() => selectServiceTab('cloud-data-engineering')} className="w-full text-left px-4 py-1.5 text-sm text-foreground/85 hover:text-foreground hover:bg-accent transition-colors pl-6 text-xs">Cloud Data Engineering</button>
                   </div>
                 </div>
               </div>
@@ -168,17 +164,17 @@ export const Header = () => {
               {mobileDropdowns.services && (
                 <div className="pl-4 space-y-1 bg-muted/30 py-1 rounded">
                   <div className="block w-full text-left px-2 py-1.5 text-xs text-foreground/80 font-semibold cursor-default">AI Transformation</div>
-                  <button onClick={() => selectServiceTab('strategy')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Strategy & Assessment</button>
-                  <button onClick={() => selectServiceTab('agents')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Specialized AI Agents</button>
-                  <button onClick={() => selectServiceTab('knowledge')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Internal Knowledge AI</button>
-                  <button onClick={() => selectServiceTab('automation')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Automation & Analytics</button>
-                  <button onClick={() => selectServiceTab('governance')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Governance & Training</button>
+                  <button onClick={() => selectServiceTab('ai-strategy-assessment')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Strategy & Assessment</button>
+                  <button onClick={() => selectServiceTab('specialized-ai-agents')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Specialized AI Agents</button>
+                  <button onClick={() => selectServiceTab('internal-knowledge-ai')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Internal Knowledge AI</button>
+                  <button onClick={() => selectServiceTab('ai-automation-analytics')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Automation & Analytics</button>
+                  <button onClick={() => selectServiceTab('ai-governance-training')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI Governance & Training</button>
 
                   <div className="block w-full text-left px-2 py-1.5 text-xs text-foreground/80 border-t border-border/40 mt-1 font-semibold cursor-default">Core Services</div>
-                  <button onClick={() => selectServiceTab('analytics')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI-Powered Data Analytics</button>
-                  <button onClick={() => selectServiceTab('consulting')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI-Consulting</button>
-                  <button onClick={() => selectServiceTab('product')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Product building</button>
-                  <button onClick={() => selectServiceTab('cloud')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Cloud Data Engineering</button>
+                  <button onClick={() => selectServiceTab('ai-powered-data-analytics')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI-Powered Data Analytics</button>
+                  <button onClick={() => selectServiceTab('ai-consulting')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">AI-Consulting</button>
+                  <button onClick={() => selectServiceTab('product-building')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Product building</button>
+                  <button onClick={() => selectServiceTab('cloud-data-engineering')} className="block w-full text-left px-4 py-1 text-[11px] text-foreground/70 hover:text-foreground">Cloud Data Engineering</button>
                 </div>
               )}
             </div>

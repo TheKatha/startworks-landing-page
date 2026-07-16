@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "../context/ThemeProvider";
 import { Header } from "../components/Header";
 import { Hero } from "../components/Hero";
@@ -18,6 +18,7 @@ import { Footer } from "../components/Footer";
 import { Toaster } from "../components/ui/sonner";
 import { BlogPage } from "../components/BlogPage";
 import { CaseStudyPage } from "../components/CaseStudyPage";
+import { ServicePage } from "../components/ServicePage";
 
 import { useEffect } from "react";
 
@@ -64,6 +65,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<HomePage scrollTarget="about" />} />
               <Route path="/services" element={<HomePage scrollTarget="services" />} />
+              <Route path="/services/:id" element={<ServicePage />} />
               <Route path="/industries" element={<HomePage scrollTarget="industries" />} />
               <Route path="/methodology" element={<HomePage scrollTarget="methodology" />} />
               <Route path="/resources" element={<HomePage scrollTarget="resources" />} />

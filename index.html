@@ -18,7 +18,7 @@
           }, {});
           if (decoded.p !== undefined) {
             // Determine base segment count (1 for repo name on GitHub Pages, 0 for custom domains/localhost)
-            var pathSegmentsToKeep = (l.hostname === 'localhost' || l.hostname === '127.0.0.1') ? 0 : 1;
+            var pathSegmentsToKeep = (l.hostname === 'localhost' || l.hostname === '127.0.0.1' || l.hostname.indexOf('github.io') === -1) ? 0 : 1;
             window.history.replaceState(null, null,
               l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') +
               (decoded.p || '') +

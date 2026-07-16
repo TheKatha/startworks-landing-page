@@ -14,9 +14,9 @@
 
       var l = window.location;
       
-      // Determine if we are on localhost or username.github.io/repo-name
-      // If localhost, we don't keep any path segments.
-      if (l.hostname === 'localhost' || l.hostname === '127.0.0.1') {
+      // Determine if we are on localhost, custom domain, or username.github.io/repo-name
+      // If localhost or custom domain, we don't keep any path segments.
+      if (l.hostname === 'localhost' || l.hostname === '127.0.0.1' || l.hostname.indexOf('github.io') === -1) {
         pathSegmentsToKeep = 0;
       } else {
         // For github pages: the path has the repository name (e.g. /the_katha or /startworks)

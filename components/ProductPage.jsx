@@ -133,39 +133,57 @@ export const ProductPage = () => {
       );
     }
 
-    // 3. EQUIBUDX: Live CPU & Latency SVG Graph simulation
+    // 3. EQUIBUDX: Coach Discovery & Payout Settlement Console
     if (product.id === 'equibudx') {
       return (
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 text-slate-200 font-mono text-xs shadow-2xl space-y-6">
+        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 text-slate-200 font-mono text-xs shadow-2xl space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <span className="text-indigo-400 font-bold flex items-center gap-1.5">
-              <Activity className="h-4 w-4 text-indigo-400" />
-              Equibudx Engine Monitor
+            <span className="text-blue-400 font-bold flex items-center gap-1.5">
+              <Activity className="h-4 w-4 text-blue-400" />
+              Coach Discovery & Payout Ledger
             </span>
-            <span className="text-emerald-400">ONLINE</span>
+            <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">LIVE</span>
           </div>
 
-          {/* Simple Animated Graph simulation using CSS grid */}
-          <div className="h-28 flex items-end gap-2.5 pb-2 border-b border-slate-900">
-            <div className="bg-indigo-600/30 w-full h-[60%] rounded-sm animate-pulse" />
-            <div className="bg-indigo-600/50 w-full h-[85%] rounded-sm animate-pulse delay-75" />
-            <div className="bg-indigo-600/40 w-full h-[40%] rounded-sm animate-pulse delay-100" />
-            <div className="bg-indigo-500 w-full h-[95%] rounded-sm animate-pulse delay-150" />
-            <div className="bg-indigo-600/60 w-full h-[70%] rounded-sm animate-pulse delay-200" />
-          </div>
+          <div className="space-y-3">
+            <div className="p-3 bg-slate-900/40 border border-slate-800 rounded-lg space-y-2">
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-slate-500">Coaches Onboarded:</span>
+                <span className="text-slate-250 font-bold">142 Active Listings</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="text-slate-500">Booking Slots Explored:</span>
+                <span className="text-slate-250 font-bold">1,820 slots/week</span>
+              </div>
+              <div className="flex justify-between items-center text-[10px] border-t border-slate-900 pt-1.5">
+                <span className="text-slate-500">Identity Checks (PAN/Bank):</span>
+                <span className="text-emerald-400 font-bold">VERIFIED</span>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center pt-2">
-            <div className="p-2 bg-slate-900 rounded">
-              <span className="text-slate-400 block text-[9px]">LATENCY</span>
-              <span className="font-extrabold text-indigo-400">18ms</span>
-            </div>
-            <div className="p-2 bg-slate-900 rounded">
-              <span className="text-slate-400 block text-[9px]">CPU</span>
-              <span className="font-extrabold text-indigo-400">42%</span>
-            </div>
-            <div className="p-2 bg-slate-900 rounded">
-              <span className="text-slate-400 block text-[9px]">UPTIME</span>
-              <span className="font-extrabold text-emerald-400">99.99%</span>
+            <div className="border border-slate-800 rounded-lg bg-slate-900/20 overflow-hidden text-[9px]">
+              <div className="bg-slate-900 px-3 py-1.5 border-b border-slate-800 text-slate-400 flex justify-between">
+                <span>TXN REF</span>
+                <span>COACH ID</span>
+                <span>STATUS / TDS</span>
+              </div>
+              <div className="p-3 space-y-2 text-slate-300">
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-400 font-mono">TXN-88022</span>
+                  <span>COACH-104</span>
+                  <span className="text-emerald-400 font-bold">SUCCESS (-10% TDS)</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-400 font-mono">TXN-88023</span>
+                  <span>COACH-092</span>
+                  <span className="text-emerald-400 font-bold">SUCCESS (-10% TDS)</span>
+                </div>
+                <div className="flex justify-between items-center text-slate-500">
+                  <span className="font-mono">TXN-88024</span>
+                  <span>COACH-221</span>
+                  <span>SETTLING...</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

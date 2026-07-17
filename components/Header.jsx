@@ -111,9 +111,9 @@ export const Header = () => {
               </div>
             </div>
 
-            <button onClick={() => scrollToSection('events')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            {/* <button onClick={() => scrollToSection('events')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events
-            </button>
+            </button> */}
             <button onClick={() => scrollToSection('equibudx')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Products & Clients
             </button>
@@ -210,9 +210,9 @@ export const Header = () => {
               )}
             </div>
 
-            <button onClick={() => scrollToSection('events')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            {/* <button onClick={() => scrollToSection('events')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events
-            </button>
+            </button> */}
              <button onClick={() => scrollToSection('equibudx')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Products & Clients
             </button>

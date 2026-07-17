@@ -46,7 +46,7 @@ const HomePage = ({ scrollTarget }) => {
       <Industries />
       <Methodology />
       <Resources />
-      <Events />
+      {/* <Events /> */}
       <Equibudx />
       <Team />
       {/* <Advisors /> */}

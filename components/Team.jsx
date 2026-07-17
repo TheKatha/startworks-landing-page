@@ -1,19 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from './ui/card';
 import { Badge } from './ui/badge';
-import { User, Users } from 'lucide-react';
+import { User } from 'lucide-react';
+
+const TeamMemberAvatar = ({ avatar, name, isFounder }) => {
+  const [imgError, setImgError] = useState(false);
+
+  if (avatar && !imgError) {
+    return (
+      <div className={`${
+        isFounder ? 'w-20 h-20' : 'w-14 h-14'
+      } rounded-full overflow-hidden border-2 border-blue-100 dark:border-blue-900/30 group-hover:scale-105 transition-transform flex-shrink-0`}>
+        <img
+          src={`${import.meta.env.BASE_URL}${avatar}`}
+          alt={name}
+          onError={() => setImgError(true)}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={`${
+      isFounder ? 'w-20 h-20' : 'w-14 h-14'
+    } rounded-full border-2 border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center group-hover:scale-105 transition-transform flex-shrink-0`}>
+      <User className={isFounder ? 'h-10 w-10 text-blue-600' : 'h-7 w-7 text-blue-600'} />
+    </div>
+  );
+};
 
 export const Team = () => {
   const engineers = [
     {
       name: 'Hymavathi Peddimudi',
       role: 'Junior SDE (Founding)',
-      specialty: 'Full Stack Development · Product Engineering · UI/UX'
+      specialty: 'Full Stack Development · Product Engineering · UI/UX',
+      avatar: 'hyma.jpg'
     },
     {
       name: 'Hemakesh Surla',
       role: 'Junior SDE (Founding)',
-      specialty: 'Full Stack Development · Cloud & DevOps · System Architecture'
+      specialty: 'Full Stack Development · Cloud & DevOps · System Architecture',
+      avatar: 'hemakesh.jpg'
     }
   ];
 
@@ -38,11 +67,7 @@ export const Team = () => {
             <CardContent className="py-5 px-6">
               <div className="flex items-start gap-5">
                 {/* Avatar */}
-                <div className="flex-shrink-0">
-                  <div className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <User className="h-10 w-10 text-blue-600" />
-                  </div>
-                </div>
+                <TeamMemberAvatar avatar="ramesh.jpg" name="Ramesh Botta" isFounder={true} />
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
@@ -59,7 +84,6 @@ export const Team = () => {
 
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">✓ TDWI Certified</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">🏆 BI-Shark</span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">🎯 Innovator Finalist</span>
                   </div>
 
@@ -86,11 +110,9 @@ export const Team = () => {
           </div>
           <div className="grid md:grid-cols-2 gap-6">
             {engineers.map((engineer, index) => (
-              <Card key={index} className="border-border/50 hover:border-blue-600/50 transition-all duration-300 hover:shadow-lg">
+              <Card key={index} className="border-border/50 hover:border-blue-600/50 transition-all duration-300 hover:shadow-lg group">
                 <CardContent className="pt-6 flex items-start space-x-4">
-                  <div className="h-14 w-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                    <User className="h-7 w-7 text-blue-600" />
-                  </div>
+                  <TeamMemberAvatar avatar={engineer.avatar} name={engineer.name} isFounder={false} />
                   <div className="flex-1">
                     <h4 className="text-lg font-semibold mb-1">{engineer.name}</h4>
                     <p className="text-sm text-blue-600 dark:text-blue-400 mb-2">{engineer.role}</p>

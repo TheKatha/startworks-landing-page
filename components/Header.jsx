@@ -94,7 +94,7 @@ export const Header = () => {
             </div>
 
             {/* Resources Dropdown */}
-            <div className="relative group py-2">
+            {/* <div className="relative group py-2">
               <button onClick={() => scrollToSection('resources')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors flex items-center gap-1">
                 Resources <ChevronDown className="h-3 w-3 opacity-60 group-hover:rotate-180 transition-transform" />
               </button>
@@ -109,7 +109,7 @@ export const Header = () => {
                   <button onClick={() => scrollToSection('resources')} className="w-full text-left px-4 py-2 text-sm text-foreground/80 hover:text-foreground hover:bg-accent transition-colors border-t border-border/50 mt-1 font-semibold">Blogs</button>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* <button onClick={() => scrollToSection('events')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events
@@ -193,8 +193,8 @@ export const Header = () => {
             </div>
 
             {/* Resources Mobile */}
-            <div>
-              <button onClick={() => toggleMobileDropdown('resources')} className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            {/* <div>
+               <button onClick={() => toggleMobileDropdown('resources')} className="flex items-center justify-between w-full px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
                 Resources <ChevronDown className={`h-4 w-4 transform transition-transform ${mobileDropdowns.resources ? 'rotate-180' : ''}`} />
               </button>
               {mobileDropdowns.resources && (
@@ -208,7 +208,7 @@ export const Header = () => {
                   <button onClick={() => scrollToSection('resources')} className="block w-full text-left px-2 py-1.5 text-xs text-foreground/70 hover:text-foreground border-t border-border/40 mt-1 font-semibold">Blogs</button>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* <button onClick={() => scrollToSection('events')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events

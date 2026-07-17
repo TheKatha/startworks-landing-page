@@ -19,6 +19,7 @@ import { Toaster } from "../components/ui/sonner";
 import { BlogPage } from "../components/BlogPage";
 import { CaseStudyPage } from "../components/CaseStudyPage";
 import { ServicePage } from "../components/ServicePage";
+import { ProductPage } from "../components/ProductPage";
 
 import { useEffect } from "react";
 
@@ -71,6 +72,8 @@ function App() {
               <Route path="/resources" element={<HomePage scrollTarget="resources" />} />
               <Route path="/events" element={<HomePage scrollTarget="events" />} />
               <Route path="/equibudx" element={<HomePage scrollTarget="equibudx" />} />
+              <Route path="/products" element={<HomePage scrollTarget="equibudx" />} />
+              <Route path="/product/:id" element={<ProductPage />} />
               <Route path="/team" element={<HomePage scrollTarget="team" />} />
               <Route path="/advisors" element={<HomePage scrollTarget="advisors" />} />
               <Route path="/contact" element={<HomePage scrollTarget="contact" />} />

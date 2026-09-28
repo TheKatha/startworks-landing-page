@@ -174,8 +174,13 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
   // Upload to Google Drive via Apps Script
   const uploadResumeToDrive = async (file) => {
     const base64 = await fileToBase64(file);
+    // Extract file extension and format a clean filename (e.g. Hemakesh_Surla_Resume.pdf)
+    const fileExt = file.name.substring(file.name.lastIndexOf('.')) || '.pdf';
+    const cleanName = formData.fullName?.trim() ? formData.fullName.trim().replace(/\s+/g, '_') : 'Candidate';
+    const cleanFileName = `${cleanName}_Resume${fileExt}`;
+
     const payload = {
-      fileName: `${formData.fullName.replace(/\s+/g, '_')}_Resume_${file.name}`,
+      fileName: cleanFileName,
       mimeType: file.type || 'application/pdf',
       base64: base64
     };

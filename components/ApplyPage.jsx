@@ -770,7 +770,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
               </div>
               <h4 className="font-semibold mb-2">Enterprise Tech Stack</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Gain hands-on experience with React, Next.js, Python, AI Agents, Cloud Data pipelines, and Equibudx product ecosystems.
+                Gain hands-on experience with React, Next.js, Python, AI Agents, Cloud Data pipelines, and modern enterprise product ecosystems.
               </p>
             </div>
           </div>

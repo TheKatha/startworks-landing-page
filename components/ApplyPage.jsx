@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
@@ -10,7 +10,11 @@ import {
   Users,
   Award,
   BookOpen,
-  GraduationCap
+  GraduationCap,
+  UploadCloud,
+  FileText,
+  X,
+  Loader2
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
@@ -19,15 +23,17 @@ import { Textarea } from './ui/textarea';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
 
+const GOOGLE_DRIVE_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbwBb1TQjngROVAq2RxIpXzaVrNrgyhe4pBzuLi64kOPUbjGiaBC8ylxi7y5onl_j3iNhw/exec";
+
 export const ApplyPage = ({ defaultTab = 'careers' }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const fileInputRef = useRef(null);
 
   const searchParams = new URLSearchParams(location.search);
   const queryTab = searchParams.get('tab');
   const queryType = searchParams.get('type');
   
-  // Normalize tab: either 'careers' or 'bootcamp'
   const resolveTab = () => {
     if (queryTab === 'bootcamp' || defaultTab === 'bootcamp') return 'bootcamp';
     return 'careers';
@@ -35,7 +41,10 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
 
   const [activeTab, setActiveTab] = useState(resolveTab());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStep, setSubmitStep] = useState(''); // 'uploading_drive' | 'saving_zoho' | ''
   const [isSuccess, setIsSuccess] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -58,33 +67,32 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
 
   // Form State
   const initialFormData = {
-    // Common
+    // Contact
     fullName: '',
     email: '',
     phone: '',
     city: '',
     linkedIn: '',
     portfolioUrl: '',
-    resumeLink: '',
     additionalNotes: '',
 
-    // Careers & Internships unified fields
+    // Careers / Internship Type
     opportunityType: queryType === 'job' ? 'Full-Time Job' : (defaultTab === 'hiring' ? 'Full-Time Job' : 'Internship'),
     roleOrDomain: 'Full-Stack Development',
     
-    // Specific to Internship
+    // Internship Details
     collegeName: '',
     degreeBranch: '',
     graduationYear: '2026',
     internshipDuration: '3 Months',
 
-    // Specific to Full-Time Job
+    // Full-Time Details
     yearsOfExperience: '1-3 Years',
     currentCompany: '',
     expectedCtc: '',
     noticePeriod: 'Immediate',
 
-    // Bootcamp specific
+    // Bootcamp Details
     bootcampTrack: 'Full Stack',
     skillLevel: 'Beginner (Basic programming knowledge)',
     preferredMode: 'Weekend Live Sessions',
@@ -95,10 +103,7 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleTabChange = (tab) => {
@@ -106,14 +111,114 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     setIsSuccess(false);
   };
 
+  // File Upload Handlers
+  const handleFileSelect = (file) => {
+    if (!file) return;
+    
+    // Check file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File size too large', {
+        description: 'Please upload a PDF under 10MB.'
+      });
+      return;
+    }
+
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type) && !file.name.endsWith('.pdf')) {
+      toast.error('Invalid file type', {
+        description: 'Please upload a PDF or Word document.'
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+    toast.success('Resume selected', { description: `${file.name} ready for upload.` });
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const removeFile = (e) => {
+    e.stopPropagation();
+    setSelectedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  // Convert File to Base64
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Upload to Google Drive via Apps Script
+  const uploadResumeToDrive = async (file) => {
+    const base64 = await fileToBase64(file);
+    const payload = {
+      fileName: `${formData.fullName.replace(/\s+/g, '_')}_Resume_${file.name}`,
+      mimeType: file.type || 'application/pdf',
+      base64: base64
+    };
+
+    const res = await fetch(GOOGLE_DRIVE_UPLOAD_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (data.status === 'success' && data.fileUrl) {
+      return data.fileUrl;
+    }
+    throw new Error(data.message || 'Failed to save to Google Drive');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (activeTab === 'careers' && !selectedFile) {
+      toast.error('Resume is required', {
+        description: 'Please upload your resume PDF to complete your application.'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
+    let driveResumeUrl = 'Not Provided';
 
     try {
+      // 1. Upload Resume PDF to Google Drive
+      if (selectedFile) {
+        setSubmitStep('Saving resume to Google Drive...');
+        driveResumeUrl = await uploadResumeToDrive(selectedFile);
+      }
+
+      // 2. Prepare Zoho CRM Lead Form Data
+      setSubmitStep('Registering profile in Zoho CRM...');
       const zohoFormData = new FormData();
       
-      // Zoho CRM Required Hidden Keys
       zohoFormData.append('xnQsjsdp', 'd6fb06afd10582600b0bb527466265ecb37accf548464e6d9da204e81479449b');
       zohoFormData.append('zc_gad', '');
       zohoFormData.append('xmIwtLD', '119e04573effde9ace59fac71b98e1b9d10ac17e0eef1e38a2d3b621e1f27f59789ceab68380aa2cc4ada2a6e91024bb');
@@ -121,7 +226,7 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('returnURL', 'null');
       zohoFormData.append('aG9uZXlwb3Q', '');
 
-      // Name handling (split full name into First & Last name for Zoho)
+      // Name Splitting
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '.';
@@ -133,7 +238,7 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('City', formData.city);
       zohoFormData.append('State', formData.city);
 
-      // Map Company and Title based on applicant path
+      // Map Company and Title
       let company = 'Startworks Candidate';
       let designation = formData.roleOrDomain || 'Applicant';
 
@@ -153,8 +258,8 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('Company', company);
       zohoFormData.append('Designation', designation);
 
-      // Build structured Description text with all applicant details & resume link
-      let description = `--- APPLICATION DETAILS ---
+      // Structured Description with Google Drive Resume link
+      let description = `=== APPLICATION DETAILS ===
 Type: ${activeTab === 'careers' ? formData.opportunityType : 'Bootcamp Learning'}
 Domain / Track: ${activeTab === 'careers' ? formData.roleOrDomain : formData.bootcampTrack}
 `;
@@ -167,8 +272,8 @@ Graduation Year: ${formData.graduationYear || 'N/A'}
 Available Duration: ${formData.internshipDuration || 'N/A'}
 `;
         } else {
-          description += `Years of Experience: ${formData.yearsOfExperience || 'N/A'}
-Current Company: ${formData.currentCompany || 'N/A'}
+          description += `Total Experience: ${formData.yearsOfExperience || 'N/A'}
+Current Employer: ${formData.currentCompany || 'N/A'}
 Expected CTC: ${formData.expectedCtc || 'N/A'}
 Notice Period: ${formData.noticePeriod || 'N/A'}
 `;
@@ -176,14 +281,14 @@ Notice Period: ${formData.noticePeriod || 'N/A'}
       } else {
         description += `Bootcamp Track: ${formData.bootcampTrack}
 Skill Level: ${formData.skillLevel}
-Preferred Learning Mode: ${formData.preferredMode}
-Learning Goals: ${formData.learningGoal || 'N/A'}
+Preferred Mode: ${formData.preferredMode}
+Goals: ${formData.learningGoal || 'N/A'}
 `;
       }
 
       description += `
---- PROFILES & RESUME ---
-Resume Link: ${formData.resumeLink || 'N/A'}
+=== RESUME & PROFILES ===
+Google Drive Resume: ${driveResumeUrl}
 LinkedIn: ${formData.linkedIn || 'N/A'}
 Portfolio / GitHub: ${formData.portfolioUrl || 'N/A'}
 Candidate Note: ${formData.additionalNotes || 'N/A'}
@@ -191,7 +296,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
 
       zohoFormData.append('Description', description);
 
-      // Send to Zoho CRM Web-to-Lead endpoint
+      // 3. Submit directly to Zoho CRM
       await fetch('https://crm.zoho.com/crm/WebToLeadForm', {
         method: 'POST',
         body: zohoFormData,
@@ -201,41 +306,26 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
 
       setIsSuccess(true);
       toast.success('Application submitted successfully!', {
-        description: 'Your details have been registered in our Zoho CRM. Our team will contact you soon.'
+        description: 'Your resume has been saved and your application is registered in Zoho CRM.'
       });
       setFormData(initialFormData);
+      setSelectedFile(null);
     } catch (error) {
-      console.error('Zoho CRM submission error:', error);
-      toast.error('Something went wrong submitting your application.', {
+      console.error('Submission error:', error);
+      toast.error('Something went wrong during submission.', {
         description: 'Please try again or email us directly at ramesh@startworks.in'
       });
     } finally {
       setIsSubmitting(false);
+      setSubmitStep('');
     }
   };
-
-  const tabsConfig = [
-    {
-      id: 'careers',
-      title: 'Careers & Internships',
-      badge: 'Work With Us',
-      icon: Briefcase,
-      description: 'Explore full-time engineering and product roles or apply for our hands-on student internship programs.',
-    },
-    {
-      id: 'bootcamp',
-      title: 'Bootcamp Learning',
-      badge: 'Learn & Upskill',
-      icon: Rocket,
-      description: 'Intensive industry-ready bootcamp in Full Stack, Data Engineering, and Solutions Architecture with capstones.',
-    }
-  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-10 pb-16 lg:pb-24 border-b border-border/40">
+      {/* 1. Header Banner */}
+      <section className="relative overflow-hidden pt-12 pb-16 border-b border-border/40">
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none -z-10">
           <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[55%] rounded-full bg-blue-600/10 dark:bg-blue-600/20 blur-[130px]" />
           <div className="absolute top-[25%] left-[-10%] w-[35%] h-[45%] rounded-full bg-indigo-600/10 dark:bg-indigo-600/20 blur-[110px]" />
@@ -243,223 +333,224 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
         </div>
 
         <div className="container mx-auto px-4 lg:px-8">
-          {/* Breadcrumbs */}
-          <nav className="flex items-center text-sm text-muted-foreground mb-8">
+          <nav className="flex items-center text-xs md:text-sm text-muted-foreground mb-6">
             <button onClick={() => navigate('/')} className="hover:text-blue-600 transition-colors">Home</button>
-            <ChevronRight className="h-4 w-4 mx-2 opacity-50" />
+            <ChevronRight className="h-3.5 w-3.5 mx-2 opacity-50" />
             <span className="text-foreground font-medium">Careers & Programs</span>
           </nav>
 
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100/60 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 text-xs md:text-sm font-medium text-blue-700 dark:text-blue-300 mb-6">
-              <Sparkles className="h-4 w-4" />
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/60 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 text-xs font-semibold text-blue-700 dark:text-blue-300 mb-4">
+              <Sparkles className="h-3.5 w-3.5" />
               <span>Join Startworks or Learn With Us</span>
             </div>
 
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
-              Build Tomorrow's{' '}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
+              Apply to{' '}
               <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Tech & AI
+                Startworks
               </span>
             </h1>
 
-            <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-              Looking to build high-impact products as an intern or full-time engineer? Or want to master in-demand skills in our practical tech bootcamp? Choose your path below.
+            <p className="text-sm md:text-base text-muted-foreground">
+              Select your path below to apply for full-time engineering roles, hands-on internships, or our practical tech bootcamps.
             </p>
           </div>
 
-          {/* 2-Tab Selector Cards */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto mt-12">
-            {tabsConfig.map((tab) => {
-              const Icon = tab.icon;
-              const isSelected = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`text-left p-6 rounded-2xl border transition-all duration-300 relative ${
-                    isSelected
-                      ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/20 shadow-lg ring-2 ring-blue-500/20'
-                      : 'border-border/60 bg-card hover:border-border hover:bg-accent/40'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`p-3 rounded-xl ${isSelected ? 'bg-blue-600 text-white' : 'bg-muted text-muted-foreground'}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <Badge variant={isSelected ? "default" : "secondary"} className="text-xs">
-                      {tab.badge}
-                    </Badge>
-                  </div>
-                  <h3 className="font-semibold text-xl mb-1.5">{tab.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {tab.description}
-                  </p>
-                </button>
-              );
-            })}
+          {/* Primary Path Switcher */}
+          <div className="grid grid-cols-2 gap-4 max-w-xl mx-auto mt-10 p-1.5 rounded-2xl bg-muted/50 border border-border/50">
+            <button
+              type="button"
+              onClick={() => handleTabChange('careers')}
+              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'careers'
+                  ? 'bg-background text-foreground shadow-md border border-border/80'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Briefcase className="h-4 w-4 text-blue-600" />
+              <span>Careers & Internships</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleTabChange('bootcamp')}
+              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                activeTab === 'bootcamp'
+                  ? 'bg-background text-foreground shadow-md border border-border/80'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Rocket className="h-4 w-4 text-indigo-600" />
+              <span>Bootcamp Learning</span>
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Form Section */}
-      <section className="py-12 lg:py-20">
-        <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
+      {/* 2. Main Form Container */}
+      <section className="py-12 lg:py-16">
+        <div className="container mx-auto px-4 max-w-3xl">
           {isSuccess ? (
-            <Card className="border-border/60 shadow-lg text-center py-12 px-6">
-              <CardContent className="space-y-6 flex flex-col items-center">
+            <Card className="border-border/60 shadow-xl text-center py-16 px-6">
+              <CardContent className="space-y-6 flex flex-col items-center max-w-md mx-auto">
                 <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-10 w-10" />
                 </div>
-                <div className="space-y-2 max-w-md">
-                  <h2 className="text-2xl font-bold">Application Received!</h2>
-                  <p className="text-muted-foreground text-sm">
-                    Thank you for applying. We have safely recorded your details. Our team will review your application and reach out to you within 2-3 business days.
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold tracking-tight">Application Submitted!</h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Thank you for applying. Your resume has been safely stored, and your profile is registered in our Zoho CRM. Our recruitment team will review your application and contact you soon.
                   </p>
                 </div>
-                <div className="flex gap-4 pt-4">
-                  <Button onClick={() => setIsSuccess(false)} variant="outline">
-                    Submit Another Application
+                <div className="flex gap-3 pt-4 w-full">
+                  <Button onClick={() => setIsSuccess(false)} variant="outline" className="flex-1">
+                    Submit Another
                   </Button>
-                  <Button onClick={() => navigate('/')}>
+                  <Button onClick={() => navigate('/')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
                     Back to Home
                   </Button>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            <Card className="border-border/60 shadow-xl bg-card">
+            <Card className="border-border/70 shadow-2xl bg-card">
               <CardHeader className="border-b border-border/40 pb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-blue-600 text-white">
-                    {activeTab === 'careers' ? <Briefcase className="h-6 w-6" /> : <Rocket className="h-6 w-6" />}
-                  </div>
+                <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-xl md:text-2xl">
-                      {activeTab === 'careers' ? 'Careers & Internships Application' : 'Bootcamp Registration Form'}
+                    <CardTitle className="text-xl md:text-2xl font-bold">
+                      {activeTab === 'careers' ? 'Careers & Internship Application' : 'Bootcamp Registration Form'}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs md:text-sm mt-1">
                       {activeTab === 'careers' 
-                        ? 'Apply for full-time positions or student internship opportunities.'
-                        : 'Enroll in our practical, hands-on engineering bootcamps.'}
+                        ? 'Join our engineering and product teams as an intern or full-time engineer.'
+                        : 'Enroll in our industry-ready engineering bootcamp with live capstones.'}
                     </CardDescription>
                   </div>
+                  <Badge variant="outline" className="hidden sm:inline-flex text-xs px-3 py-1 font-medium">
+                    {activeTab === 'careers' ? 'Hiring Active' : 'Admissions Open'}
+                  </Badge>
                 </div>
               </CardHeader>
 
               <CardContent className="pt-8">
                 <form onSubmit={handleSubmit} className="space-y-8">
                   
-                  {/* Step 1: Personal Details */}
-                  <div>
-                    <h3 className="text-sm font-semibold tracking-wider uppercase text-blue-600 dark:text-blue-400 mb-4 flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold">1</span>
-                      Personal Details
+                  {/* --- SUB-SWITCHER FOR CAREERS --- */}
+                  {activeTab === 'careers' && (
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                        Select Application Type *
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, opportunityType: 'Internship' }))}
+                          className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                            formData.opportunityType === 'Internship'
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500/20 shadow-sm'
+                              : 'border-border/60 hover:bg-accent/40 text-muted-foreground'
+                          }`}
+                        >
+                          <GraduationCap className="h-4 w-4" />
+                          <span>Internship</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, opportunityType: 'Full-Time Job' }))}
+                          className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-sm font-semibold transition-all ${
+                            formData.opportunityType === 'Full-Time Job'
+                              ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 ring-2 ring-blue-500/20 shadow-sm'
+                              : 'border-border/60 hover:bg-accent/40 text-muted-foreground'
+                          }`}
+                        >
+                          <Briefcase className="h-4 w-4" />
+                          <span>Full-Time Role</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* --- SECTION 1: PERSONAL INFORMATION --- */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                      1. Contact Information
                     </h3>
-                    
+
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Full Name *</label>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">Full Name *</label>
                         <Input
                           name="fullName"
                           value={formData.fullName}
                           onChange={handleInputChange}
-                          placeholder="e.g. John Doe"
+                          placeholder="Your legal name"
                           required
+                          className="h-11"
                         />
                       </div>
-                      
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Email Address *</label>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">Email Address *</label>
                         <Input
                           type="email"
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          placeholder="e.g. john@example.com"
+                          placeholder="name@example.com"
                           required
+                          className="h-11"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Phone / WhatsApp Number *</label>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">Phone / WhatsApp Number *</label>
                         <Input
                           type="tel"
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
-                          placeholder="e.g. +91 9876543210"
+                          placeholder="+91 9876543210"
                           required
+                          className="h-11"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Current City / Location *</label>
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">Current City / Location *</label>
                         <Input
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
                           placeholder="e.g. Visakhapatnam / Hyderabad"
                           required
+                          className="h-11"
                         />
                       </div>
                     </div>
                   </div>
 
-                  {/* Step 2: TAB SPECIFIC FIELDS */}
-                  <div className="border-t border-border/40 pt-6">
-                    <h3 className="text-sm font-semibold tracking-wider uppercase text-blue-600 dark:text-blue-400 mb-4 flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold">2</span>
-                      {activeTab === 'careers' ? 'Role & Professional Details' : 'Bootcamp Track & Preferences'}
+                  {/* --- SECTION 2: PROGRAM SPECIFIC DETAILS --- */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                      {activeTab === 'careers' ? '2. Role & Academic / Experience Details' : '2. Bootcamp Track & Preferences'}
                     </h3>
 
-                    {/* UNIFIED CAREERS & INTERNSHIPS FORM */}
+                    {/* CAREERS: Common Role dropdown */}
                     {activeTab === 'careers' && (
-                      <div className="space-y-6">
-                        
-                        {/* Selector for Internship vs Full-Time */}
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">I am applying for *</label>
-                          <div className="grid grid-cols-2 gap-4">
-                            <button
-                              type="button"
-                              onClick={() => setFormData(prev => ({ ...prev, opportunityType: 'Internship' }))}
-                              className={`p-3.5 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                                formData.opportunityType === 'Internship'
-                                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500'
-                                  : 'border-border/60 hover:bg-accent/40'
-                              }`}
-                            >
-                              <GraduationCap className="h-4 w-4" />
-                              <span>Internship (Student / Fresher)</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => setFormData(prev => ({ ...prev, opportunityType: 'Full-Time Job' }))}
-                              className={`p-3.5 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                                formData.opportunityType === 'Full-Time Job'
-                                  ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500'
-                                  : 'border-border/60 hover:bg-accent/40'
-                              }`}
-                            >
-                              <Briefcase className="h-4 w-4" />
-                              <span>Full-Time Role</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* Common to both: Role / Domain */}
+                      <div className="space-y-4">
                         <div className="grid md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Role / Domain *</label>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-foreground/90">Target Role / Domain *</label>
                             <select
                               name="roleOrDomain"
                               value={formData.roleOrDomain}
                               onChange={handleInputChange}
                               required
-                              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                               <option value="Full-Stack Development">Full-Stack Development</option>
                               <option value="AI & Machine Learning">AI & Machine Learning</option>
@@ -472,14 +563,14 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           </div>
 
                           {formData.opportunityType === 'Internship' ? (
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Available Duration *</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Internship Duration *</label>
                               <select
                                 name="internshipDuration"
                                 value={formData.internshipDuration}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="2-3 Months">2 - 3 Months</option>
                                 <option value="6 Months">6 Months</option>
@@ -487,14 +578,14 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                               </select>
                             </div>
                           ) : (
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Total Experience *</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Total Years of Experience *</label>
                               <select
                                 name="yearsOfExperience"
                                 value={formData.yearsOfExperience}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="0-1 Years">0 - 1 Years (Entry Level)</option>
                                 <option value="1-3 Years">1 - 3 Years</option>
@@ -505,39 +596,41 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           )}
                         </div>
 
-                        {/* Fields specific to INTERNSHIP */}
+                        {/* INTERNSHIP SPECIFIC */}
                         {formData.opportunityType === 'Internship' && (
-                          <div className="grid md:grid-cols-3 gap-4 p-4 rounded-xl bg-accent/20 border border-border/40">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">College / University *</label>
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">College / University *</label>
                               <Input
                                 name="collegeName"
                                 value={formData.collegeName}
                                 onChange={handleInputChange}
                                 placeholder="e.g. Andhra University"
                                 required
+                                className="h-11"
                               />
                             </div>
 
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Degree & Branch *</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Degree & Branch *</label>
                               <Input
                                 name="degreeBranch"
                                 value={formData.degreeBranch}
                                 onChange={handleInputChange}
                                 placeholder="e.g. B.Tech CSE"
                                 required
+                                className="h-11"
                               />
                             </div>
 
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Graduation Year *</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Graduation Year *</label>
                               <select
                                 name="graduationYear"
                                 value={formData.graduationYear}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="2027">2027</option>
                                 <option value="2026">2026</option>
@@ -549,37 +642,39 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           </div>
                         )}
 
-                        {/* Fields specific to FULL-TIME JOB */}
+                        {/* FULL-TIME SPECIFIC */}
                         {formData.opportunityType === 'Full-Time Job' && (
-                          <div className="grid md:grid-cols-3 gap-4 p-4 rounded-xl bg-accent/20 border border-border/40">
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Current Employer</label>
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Current Employer</label>
                               <Input
                                 name="currentCompany"
                                 value={formData.currentCompany}
                                 onChange={handleInputChange}
-                                placeholder="e.g. Current Company"
+                                placeholder="e.g. TCS / Freelancer"
+                                className="h-11"
                               />
                             </div>
 
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Expected CTC</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Expected CTC</label>
                               <Input
                                 name="expectedCtc"
                                 value={formData.expectedCtc}
                                 onChange={handleInputChange}
                                 placeholder="e.g. 6 LPA / 10 LPA"
+                                className="h-11"
                               />
                             </div>
 
-                            <div className="space-y-2">
-                              <label className="text-sm font-medium">Notice Period *</label>
+                            <div className="space-y-1.5">
+                              <label className="text-xs font-medium text-foreground/90">Notice Period *</label>
                               <select
                                 name="noticePeriod"
                                 value={formData.noticePeriod}
                                 onChange={handleInputChange}
                                 required
-                                className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
                                 <option value="Immediate">Immediate</option>
                                 <option value="15 Days">15 Days</option>
@@ -589,7 +684,6 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                             </div>
                           </div>
                         )}
-
                       </div>
                     )}
 
@@ -597,14 +691,14 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                     {activeTab === 'bootcamp' && (
                       <div className="space-y-4">
                         <div className="grid md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Bootcamp Track Interested In *</label>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-foreground/90">Bootcamp Track Interested In *</label>
                             <select
                               name="bootcampTrack"
                               value={formData.bootcampTrack}
                               onChange={handleInputChange}
                               required
-                              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                              className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                             >
                               <option value="Full Stack">Full Stack</option>
                               <option value="Data Engineer">Data Engineer</option>
@@ -612,14 +706,14 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                             </select>
                           </div>
 
-                          <div className="space-y-2">
-                            <label className="text-sm font-medium">Current Skill Level *</label>
+                          <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-foreground/90">Current Skill Level *</label>
                             <select
                               name="skillLevel"
                               value={formData.skillLevel}
                               onChange={handleInputChange}
                               required
-                              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
                               <option value="Beginner (Basic programming knowledge)">Beginner (Basic programming knowledge)</option>
                               <option value="Intermediate (Built some personal projects)">Intermediate (Built some personal projects)</option>
@@ -629,14 +723,14 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <label className="text-sm font-medium">Preferred Learning Mode *</label>
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-foreground/90">Preferred Learning Mode *</label>
                           <select
                             name="preferredMode"
                             value={formData.preferredMode}
                             onChange={handleInputChange}
                             required
-                            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                           >
                             <option value="Weekend Live Sessions">Weekend Live Sessions (Interactive & Project-based)</option>
                             <option value="Weekday Evenings">Weekday Evenings</option>
@@ -647,16 +741,87 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                     )}
                   </div>
 
-                  {/* Step 3: Profiles & Links */}
-                  <div className="border-t border-border/40 pt-6">
-                    <h3 className="text-sm font-semibold tracking-wider uppercase text-blue-600 dark:text-blue-400 mb-4 flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold">3</span>
-                      Profiles & Resume
+                  {/* --- SECTION 3: RESUME PDF DROPZONE & PROFILES --- */}
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                      3. {activeTab === 'careers' ? 'Resume Upload (PDF) & Profiles' : 'Profiles & Learning Goals'}
                     </h3>
 
-                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    {/* DRAG AND DROP RESUME UPLOADER */}
+                    {activeTab === 'careers' && (
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                        <label className="text-xs font-medium text-foreground/90 flex items-center justify-between">
+                          <span>Upload Resume (PDF) *</span>
+                          <span className="text-[11px] text-muted-foreground">Saved to Google Drive</span>
+                        </label>
+
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          onChange={(e) => handleFileSelect(e.target.files[0])}
+                          className="hidden"
+                          id="resume-file-upload"
+                        />
+
+                        {!selectedFile ? (
+                          <div
+                            onDrop={handleDrop}
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                            className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                              isDragging 
+                                ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/30' 
+                                : 'border-border/70 hover:border-blue-500/60 bg-muted/20 hover:bg-accent/20'
+                            }`}
+                          >
+                            <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                              <UploadCloud className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-foreground">
+                                Click to upload or drag & drop your resume
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Supported format: PDF, DOC, DOCX (Max: 10MB)
+                              </p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="p-4 rounded-xl border border-blue-500/40 bg-blue-50/40 dark:bg-blue-950/30 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2.5 rounded-lg bg-blue-600 text-white">
+                                <FileText className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-foreground truncate max-w-[260px] md:max-w-md">
+                                  {selectedFile.name}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB • Ready for Google Drive upload
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={removeFile}
+                              className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* LINKS GRID */}
+                    <div className="grid md:grid-cols-2 gap-4 pt-1">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">
                           LinkedIn Profile URL {activeTab === 'careers' && '*'}
                         </label>
                         <Input
@@ -666,11 +831,12 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           onChange={handleInputChange}
                           placeholder="https://linkedin.com/in/username"
                           required={activeTab === 'careers'}
+                          className="h-11"
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-medium text-foreground/90">
                           GitHub / Portfolio URL
                         </label>
                         <Input
@@ -678,53 +844,38 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           name="portfolioUrl"
                           value={formData.portfolioUrl}
                           onChange={handleInputChange}
-                          placeholder="https://github.com/username or website"
+                          placeholder="https://github.com/username"
+                          className="h-11"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Resume / CV Link (Google Drive / Dropbox) {activeTab === 'careers' && '*'}
-                      </label>
-                      <Input
-                        type="url"
-                        name="resumeLink"
-                        value={formData.resumeLink}
-                        onChange={handleInputChange}
-                        placeholder="https://drive.google.com/file/d/... (Set sharing to 'Anyone with link')"
-                        required={activeTab === 'careers'}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Upload your PDF to Google Drive or Dropbox and paste the shareable link with view access enabled.
-                      </p>
-                    </div>
-
-                    <div className="space-y-2 mt-4">
-                      <label className="text-sm font-medium">
-                        {activeTab === 'bootcamp' ? 'What are your learning goals?' : 'Why do you want to join Startworks? / Brief note'}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground/90">
+                        {activeTab === 'bootcamp' ? 'Learning Goals / Background' : 'Cover Note / Brief Pitch'}
                       </label>
                       <Textarea
                         name="additionalNotes"
                         value={formData.additionalNotes}
                         onChange={handleInputChange}
                         rows={3}
-                        placeholder="Tell us briefly about your background, achievements, or what you hope to achieve..."
+                        placeholder="Briefly tell us about your key skills, projects, or why you want to join Startworks..."
+                        className="resize-none"
                       />
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <div className="pt-4">
+                  {/* SUBMIT BUTTON */}
+                  <div className="pt-2">
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full h-12 text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
+                      className="w-full h-12 text-sm md:text-base font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
                     >
                       {isSubmitting ? (
                         <span className="flex items-center gap-2">
-                          <span className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                          Submitting Application...
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          <span>{submitStep || 'Submitting...'}</span>
                         </span>
                       ) : (
                         <span className="flex items-center justify-center gap-2">
@@ -733,8 +884,8 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                         </span>
                       )}
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground mt-3">
-                      By submitting, you agree to our privacy policy and consent to Startworks contacting you regarding this application.
+                    <p className="text-center text-[11px] text-muted-foreground mt-3">
+                      By submitting, your resume is saved to Google Drive and your application is sent to Startworks Zoho CRM.
                     </p>
                   </div>
                 </form>
@@ -742,35 +893,35 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
             </Card>
           )}
 
-          {/* Program Highlights & Features */}
-          <div className="mt-16 grid md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center mb-4">
+          {/* Program Highlights */}
+          <div className="mt-14 grid md:grid-cols-3 gap-5">
+            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
+              <div className="h-9 w-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center mb-3">
                 <Users className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold mb-2">Live Mentorship</h4>
+              <h4 className="font-semibold text-sm mb-1.5">Senior Mentorship</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Work directly alongside seasoned engineers, AI architects, and domain experts on real production architectures.
+                Work directly with experienced engineers on live AI, cloud, and modern web architectures.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-10 w-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center mb-4">
+            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
+              <div className="h-9 w-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center mb-3">
                 <Award className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold mb-2">PPO & Hiring Pipeline</h4>
+              <h4 className="font-semibold text-sm mb-1.5">PPO & Career Pathway</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                High-performing interns and bootcamp graduates are prioritized for full-time job offers and ongoing consulting roles.
+                High-performing interns and bootcamp graduates are prioritized for ongoing engineering roles.
               </p>
             </div>
 
-            <div className="p-6 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-10 w-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 flex items-center justify-center mb-4">
+            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
+              <div className="h-9 w-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 flex items-center justify-center mb-3">
                 <BookOpen className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold mb-2">Enterprise Tech Stack</h4>
+              <h4 className="font-semibold text-sm mb-1.5">Enterprise Tech Stack</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Gain hands-on experience with React, Next.js, Python, AI Agents, Cloud Data pipelines, and modern enterprise product ecosystems.
+                Build real features using React, Next.js, Python, AI Agents, and scalable cloud data pipelines.
               </p>
             </div>
           </div>

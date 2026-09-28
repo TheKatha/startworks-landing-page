@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Linkedin, Mail, Instagram, Youtube } from 'lucide-react';
 import { useTheme } from '../context/ThemeProvider';
 
@@ -10,7 +11,9 @@ export const Footer = () => {
     company: [
       { name: 'About Us', href: '#about' },
       { name: 'Our Team', href: '#team' },
-      { name: 'Careers', href: '#contact' }
+      { name: 'Careers & Hiring', href: '/careers' },
+      { name: 'Internships', href: '/internships' },
+      { name: 'Bootcamp Learning', href: '/bootcamp' }
     ],
     products: [
       { name: 'Equibudx', href: '#equibudx' },
@@ -68,12 +71,21 @@ export const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.company.map((link, index) => (
                 <li key={index}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
-                  >
-                    {link.name}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

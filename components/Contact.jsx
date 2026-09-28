@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
-import { Mail, Phone, MapPin, Send, Briefcase } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Briefcase, ChevronRight } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 
 export const Contact = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: '',
@@ -70,7 +72,7 @@ export const Contact = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Ready to transform your business? Contact us for partnerships, inquiries about Equibudx, or to explore career opportunities.
+            Ready to transform your business? Contact us for enterprise solutions, partnerships, or inquiries about Equibudx.
           </p>
         </div>
 
@@ -168,6 +170,29 @@ export const Contact = () => {
                 </Card>
               );
             })}
+
+            {/* Direct link to Careers & Programs portal */}
+            <Card 
+              onClick={() => navigate('/careers')}
+              className="border-blue-500/30 bg-blue-50/50 dark:bg-blue-950/20 hover:border-blue-600 transition-all duration-300 hover:shadow-lg group cursor-pointer"
+            >
+              <CardContent className="pt-6">
+                <div className="flex items-start space-x-3">
+                  <div className="h-10 w-10 rounded-lg bg-blue-600 text-white flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Briefcase className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1 flex items-center gap-1">
+                      Careers & Programs
+                      <ChevronRight className="h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Looking for internships, full-time engineering roles, or tech bootcamps? Apply directly here.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

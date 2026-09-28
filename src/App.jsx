@@ -20,6 +20,7 @@ import { BlogPage } from "../components/BlogPage";
 import { CaseStudyPage } from "../components/CaseStudyPage";
 import { ServicePage } from "../components/ServicePage";
 import { ProductPage } from "../components/ProductPage";
+import { ApplyPage } from "../components/ApplyPage";
 
 import { useEffect } from "react";
 
@@ -79,6 +80,10 @@ function App() {
               <Route path="/contact" element={<HomePage scrollTarget="contact" />} />
               <Route path="/blog/:id" element={<BlogPage />} />
               <Route path="/case-study/:id" element={<CaseStudyPage />} />
+              <Route path="/careers" element={<ApplyPage defaultTab="hiring" />} />
+              <Route path="/apply" element={<ApplyPage defaultTab="internship" />} />
+              <Route path="/internships" element={<ApplyPage defaultTab="internship" />} />
+              <Route path="/bootcamp" element={<ApplyPage defaultTab="bootcamp" />} />
             </Routes>
           </main>
           <Footer />

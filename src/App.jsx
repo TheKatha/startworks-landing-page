@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "../context/ThemeProvider";
 import { Header } from "../components/Header";
 import { Hero } from "../components/Hero";
@@ -20,7 +20,8 @@ import { BlogPage } from "../components/BlogPage";
 import { CaseStudyPage } from "../components/CaseStudyPage";
 import { ServicePage } from "../components/ServicePage";
 import { ProductPage } from "../components/ProductPage";
-import { ApplyPage } from "../components/ApplyPage";
+import { CareersPage } from "../components/CareersPage";
+import { ProgramsPage } from "../components/ProgramsPage";
 
 import { useEffect } from "react";
 
@@ -72,18 +73,20 @@ function App() {
               <Route path="/methodology" element={<HomePage scrollTarget="methodology" />} />
               <Route path="/resources" element={<HomePage scrollTarget="resources" />} />
               <Route path="/events" element={<HomePage scrollTarget="events" />} />
-              <Route path="/equibudx" element={<HomePage scrollTarget="equibudx" />} />
-              <Route path="/products" element={<HomePage scrollTarget="equibudx" />} />
+              <Route path="/products" element={<HomePage scrollTarget="products" />} />
+              <Route path="/portfolio" element={<HomePage scrollTarget="products" />} />
+              <Route path="/equibudx" element={<Navigate to="/product/equibudx" replace />} />
               <Route path="/product/:id" element={<ProductPage />} />
               <Route path="/team" element={<HomePage scrollTarget="team" />} />
               <Route path="/advisors" element={<HomePage scrollTarget="advisors" />} />
               <Route path="/contact" element={<HomePage scrollTarget="contact" />} />
               <Route path="/blog/:id" element={<BlogPage />} />
               <Route path="/case-study/:id" element={<CaseStudyPage />} />
-              <Route path="/careers" element={<ApplyPage defaultTab="hiring" />} />
-              <Route path="/apply" element={<ApplyPage defaultTab="internship" />} />
-              <Route path="/internships" element={<ApplyPage defaultTab="internship" />} />
-              <Route path="/bootcamp" element={<ApplyPage defaultTab="bootcamp" />} />
+              <Route path="/careers" element={<CareersPage defaultType="Full-Time Job" />} />
+              <Route path="/internships" element={<CareersPage defaultType="Internship" />} />
+              <Route path="/apply" element={<CareersPage defaultType="Internship" />} />
+              <Route path="/programs" element={<ProgramsPage />} />
+              <Route path="/bootcamp" element={<ProgramsPage />} />
             </Routes>
           </main>
           <Footer />

@@ -114,11 +114,14 @@ export const Header = () => {
             {/* <button onClick={() => scrollToSection('events')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events
             </button> */}
-            <button onClick={() => scrollToSection('equibudx')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            <button onClick={() => scrollToSection('products')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Products & Clients
             </button>
             <button onClick={() => navigate('/careers')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-              Careers & Programs
+              Careers
+            </button>
+            <button onClick={() => navigate('/programs')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+              Programs
             </button>
             <button onClick={() => scrollToSection('contact')} className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Contact
@@ -216,11 +219,14 @@ export const Header = () => {
             {/* <button onClick={() => scrollToSection('events')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Events
             </button> */}
-             <button onClick={() => scrollToSection('equibudx')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+             <button onClick={() => scrollToSection('products')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Products & Clients
             </button>
             <button onClick={() => { setMobileMenuOpen(false); navigate('/careers'); }} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-              Careers & Programs
+              Careers
+            </button>
+            <button onClick={() => { setMobileMenuOpen(false); navigate('/programs'); }} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+              Programs
             </button>
             <button onClick={() => scrollToSection('contact')} className="block w-full text-left px-2 py-2 text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
               Contact

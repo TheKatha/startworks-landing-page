@@ -13,10 +13,11 @@ export const Footer = () => {
       { name: 'Our Team', href: '#team' },
       { name: 'Careers & Hiring', href: '/careers' },
       { name: 'Internships', href: '/internships' },
-      { name: 'Bootcamp Learning', href: '/bootcamp' }
+      { name: 'Bootcamp Programs', href: '/programs' }
     ],
     products: [
-      { name: 'Equibudx', href: '#equibudx' },
+      { name: 'Equibudx', href: '/product/equibudx' },
+      { name: 'Portfolio Console', href: '/products' },
       { name: 'Solutions', href: '#services' },
       { name: 'Case Studies', href: '#resources' },
       { name: 'Documentation', href: '#resources' }
@@ -97,12 +98,21 @@ export const Footer = () => {
             <ul className="space-y-2">
               {footerLinks.products.map((link, index) => (
                 <li key={index}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
-                  >
-                    {link.name}
-                  </a>
+                  {link.href.startsWith('/') ? (
+                    <Link
+                      to={link.href}
+                      className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-blue-600 transition-colors"
+                    >
+                      {link.name}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

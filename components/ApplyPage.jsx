@@ -5,16 +5,25 @@ import {
   Rocket, 
   ChevronRight, 
   CheckCircle2, 
-  ArrowRight,
-  Sparkles,
-  Users,
-  Award,
-  BookOpen,
-  GraduationCap,
-  UploadCloud,
-  FileText,
-  X,
-  Loader2
+  ArrowRight, 
+  Sparkles, 
+  Users, 
+  Award, 
+  BookOpen, 
+  GraduationCap, 
+  UploadCloud, 
+  FileText, 
+  X, 
+  Loader2,
+  Code2,
+  Database,
+  Layers,
+  Clock,
+  Compass,
+  Check,
+  ShieldCheck,
+  Zap,
+  ArrowDown
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
@@ -29,6 +38,7 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef(null);
+  const formSectionRef = useRef(null);
 
   const searchParams = new URLSearchParams(location.search);
   const queryTab = searchParams.get('tab');
@@ -41,14 +51,10 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
 
   const [activeTab, setActiveTab] = useState(resolveTab());
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStep, setSubmitStep] = useState(''); // 'uploading_drive' | 'saving_zoho' | ''
+  const [submitStep, setSubmitStep] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [activeTab]);
 
   useEffect(() => {
     if (queryTab && ['careers', 'internship', 'hiring', 'bootcamp'].includes(queryTab)) {
@@ -67,7 +73,6 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
 
   // Form State
   const initialFormData = {
-    // Contact
     fullName: '',
     email: '',
     phone: '',
@@ -76,26 +81,21 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     portfolioUrl: '',
     additionalNotes: '',
 
-    // Careers / Internship Type
     opportunityType: queryType === 'job' ? 'Full-Time Job' : (defaultTab === 'hiring' ? 'Full-Time Job' : 'Internship'),
     roleOrDomain: 'Full-Stack Development',
     
-    // Internship Details
     collegeName: '',
     degreeBranch: '',
     graduationYear: '2026',
     internshipDuration: '3 Months',
 
-    // Full-Time Details
     yearsOfExperience: '1-3 Years',
     currentCompany: '',
     expectedCtc: '',
     noticePeriod: 'Immediate',
 
-    // Bootcamp Details
     bootcampTrack: 'Full Stack',
     skillLevel: 'Beginner (Basic programming knowledge)',
-    preferredMode: 'Weekend Live Sessions',
     learningGoal: ''
   };
 
@@ -106,31 +106,34 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleTabChange = (tab) => {
+  const scrollToForm = (tab, type = null, track = null) => {
     setActiveTab(tab);
+    if (type) {
+      setFormData(prev => ({ ...prev, opportunityType: type }));
+    }
+    if (track) {
+      setFormData(prev => ({ ...prev, bootcampTrack: track }));
+    }
     setIsSuccess(false);
+
+    setTimeout(() => {
+      if (formSectionRef.current) {
+        formSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
-  // File Upload Handlers
   const handleFileSelect = (file) => {
     if (!file) return;
-    
-    // Check file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size too large', {
-        description: 'Please upload a PDF under 10MB.'
-      });
+      toast.error('File size too large', { description: 'Please upload a PDF under 10MB.' });
       return;
     }
-
     const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
     if (!validTypes.includes(file.type) && !file.name.endsWith('.pdf')) {
-      toast.error('Invalid file type', {
-        description: 'Please upload a PDF or Word document.'
-      });
+      toast.error('Invalid file type', { description: 'Please upload a PDF document.' });
       return;
     }
-
     setSelectedFile(file);
     toast.success('Resume selected', { description: `${file.name} ready for upload.` });
   };
@@ -158,7 +161,6 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Convert File to Base64
   const fileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -171,10 +173,8 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     });
   };
 
-  // Upload to Google Drive via Apps Script
   const uploadResumeToDrive = async (file) => {
     const base64 = await fileToBase64(file);
-    // Extract file extension and format a clean filename (e.g. Hemakesh_Surla_Resume.pdf)
     const fileExt = file.name.substring(file.name.lastIndexOf('.')) || '.pdf';
     const cleanName = formData.fullName?.trim() ? formData.fullName.trim().replace(/\s+/g, '_') : 'Candidate';
     const cleanFileName = `${cleanName}_Resume${fileExt}`;
@@ -214,13 +214,11 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     let driveResumeUrl = 'Not Provided';
 
     try {
-      // 1. Upload Resume PDF to Google Drive
       if (selectedFile) {
         setSubmitStep('Saving resume to Google Drive...');
         driveResumeUrl = await uploadResumeToDrive(selectedFile);
       }
 
-      // 2. Prepare Zoho CRM Lead Form Data
       setSubmitStep('Registering profile in Zoho CRM...');
       const zohoFormData = new FormData();
       
@@ -231,7 +229,6 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('returnURL', 'null');
       zohoFormData.append('aG9uZXlwb3Q', '');
 
-      // Name Splitting
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts.length > 1 ? nameParts.slice(0, -1).join(' ') : nameParts[0];
       const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '.';
@@ -243,7 +240,6 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('City', formData.city);
       zohoFormData.append('State', formData.city);
 
-      // Map Company and Title
       let company = 'Startworks Candidate';
       let designation = formData.roleOrDomain || 'Applicant';
 
@@ -263,7 +259,6 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
       zohoFormData.append('Company', company);
       zohoFormData.append('Designation', designation);
 
-      // Structured Description with Google Drive Resume link
       let description = `=== APPLICATION DETAILS ===
 Type: ${activeTab === 'careers' ? formData.opportunityType : 'Bootcamp Learning'}
 Domain / Track: ${activeTab === 'careers' ? formData.roleOrDomain : formData.bootcampTrack}
@@ -286,7 +281,6 @@ Notice Period: ${formData.noticePeriod || 'N/A'}
       } else {
         description += `Bootcamp Track: ${formData.bootcampTrack}
 Skill Level: ${formData.skillLevel}
-Preferred Mode: ${formData.preferredMode}
 Goals: ${formData.learningGoal || 'N/A'}
 `;
       }
@@ -301,7 +295,6 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
 
       zohoFormData.append('Description', description);
 
-      // 3. Submit directly to Zoho CRM
       await fetch('https://crm.zoho.com/crm/WebToLeadForm', {
         method: 'POST',
         body: zohoFormData,
@@ -329,8 +322,10 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       
-      {/* 1. Header Banner */}
-      <section className="relative overflow-hidden pt-12 pb-16 border-b border-border/40">
+      {/* ========================================================
+          1. HERO SECTION: BRANDING & STORYTELLING
+          ======================================================== */}
+      <section className="relative overflow-hidden pt-12 pb-20 lg:pb-28 border-b border-border/40">
         <div className="absolute top-0 right-0 w-full h-full overflow-hidden pointer-events-none -z-10">
           <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[55%] rounded-full bg-blue-600/10 dark:bg-blue-600/20 blur-[130px]" />
           <div className="absolute top-[25%] left-[-10%] w-[35%] h-[45%] rounded-full bg-indigo-600/10 dark:bg-indigo-600/20 blur-[110px]" />
@@ -338,36 +333,284 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
         </div>
 
         <div className="container mx-auto px-4 lg:px-8">
-          <nav className="flex items-center text-xs md:text-sm text-muted-foreground mb-6">
+          {/* Breadcrumb */}
+          <nav className="flex items-center text-xs md:text-sm text-muted-foreground mb-8">
             <button onClick={() => navigate('/')} className="hover:text-blue-600 transition-colors">Home</button>
             <ChevronRight className="h-3.5 w-3.5 mx-2 opacity-50" />
-            <span className="text-foreground font-medium">Careers & Programs</span>
+            <span className="text-foreground font-medium">Careers, Internships & Bootcamps</span>
           </nav>
 
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/60 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/50 text-xs font-semibold text-blue-700 dark:text-blue-300 mb-4">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Join Startworks or Learn With Us</span>
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            {/* Left Content */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/70 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800/60 text-xs font-semibold text-blue-700 dark:text-blue-300">
+                <Sparkles className="h-4 w-4" />
+                <span>Shape the Next Era of AI & Cloud</span>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
+                Where Ambition Meets{' '}
+                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 bg-clip-text text-transparent">
+                  Real Engineering.
+                </span>
+              </h1>
+
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl">
+                At Startworks, we build transformative AI platforms, cloud data pipelines, and mission-critical enterprise systems. Whether you are stepping in as an intern, joining our core engineering team, or advancing your career through our intensive bootcamps — you will work on real architectures from Day 1.
+              </p>
+
+              {/* Action CTAs */}
+              <div className="flex flex-wrap gap-4 pt-2">
+                <Button 
+                  onClick={() => scrollToForm('careers')} 
+                  size="lg" 
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25 h-12 px-6 font-semibold"
+                >
+                  Explore Opportunities
+                  <ArrowDown className="ml-2 h-4 w-4" />
+                </Button>
+                <Button 
+                  onClick={() => scrollToForm('bootcamp')} 
+                  variant="outline" 
+                  size="lg" 
+                  className="h-12 px-6 font-semibold border-border hover:bg-accent"
+                >
+                  Bootcamp Programs
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Value Badges */}
+              <div className="pt-6 grid grid-cols-3 gap-4 border-t border-border/50 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                  <span>Real Enterprise Products</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-indigo-600 flex-shrink-0" />
+                  <span>1-on-1 Mentorship</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-cyan-600 flex-shrink-0" />
+                  <span>Fast-Track PPO Hiring</span>
+                </div>
+              </div>
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
-              Apply to{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Startworks
-              </span>
-            </h1>
+            {/* Right Media Display */}
+            <div className="lg:col-span-5 relative">
+              <div className="relative mx-auto rounded-3xl overflow-hidden shadow-2xl border border-border/60 bg-muted/30 group">
+                <img 
+                  src={`${import.meta.env.BASE_URL}careers-team.jpg`} 
+                  alt="Startworks Engineering & Learning Community"
+                  className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
+                  onError={(e) => {
+                    // Fallback to elegant gradient if image not found
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent pointer-events-none" />
+                
+                {/* Floating Highlights Tag */}
+                <div className="absolute bottom-4 left-4 right-4 p-4 rounded-2xl bg-background/80 backdrop-blur-md border border-border/60 shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-foreground">Innovate with Startworks</p>
+                      <p className="text-[11px] text-muted-foreground">Visakhapatnam</p>
+                    </div>
+                    <Badge variant="default" className="bg-blue-600 text-[10px] uppercase font-bold">
+                      Open Positions
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* ========================================================
+          2. DETAILED PROGRAM EXPLANATION ("WHAT WILL BE THERE")
+          ======================================================== */}
+      <section className="py-20 lg:py-28 bg-muted/10 border-b border-border/40">
+        <div className="container mx-auto px-4 lg:px-8">
+          
+          <div className="max-w-3xl mx-auto text-center mb-16 space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/60 dark:bg-blue-900/30 text-xs font-bold text-blue-600 dark:text-blue-400">
+              <Compass className="h-3.5 w-3.5" />
+              <span>Three Pathways to Accelerate Your Career</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Choose the Journey That Fits Your Goals
+            </h2>
             <p className="text-sm md:text-base text-muted-foreground">
-              Select your path below to apply for full-time engineering roles, hands-on internships, or our practical tech bootcamps.
+              We provide structured environments where you tackle real challenges, build scalable enterprise architectures, and work alongside seasoned industry practitioners.
             </p>
           </div>
 
-          {/* Primary Path Switcher */}
-          <div className="grid grid-cols-2 gap-4 max-w-xl mx-auto mt-10 p-1.5 rounded-2xl bg-muted/50 border border-border/50">
+          {/* 3 Detailed Program Cards */}
+          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            
+            {/* PATHWAY 1: INTERNSHIP PROGRAM */}
+            <Card className="flex flex-col justify-between border-border/60 hover:border-blue-600/60 transition-all duration-300 hover:shadow-xl group bg-card">
+              <CardHeader className="space-y-3 pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center">
+                    <GraduationCap className="h-6 w-6" />
+                  </div>
+                  <Badge variant="secondary" className="text-xs font-medium">Students & Fresh Grads</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">Internship Program</CardTitle>
+                <CardDescription className="text-xs leading-relaxed">
+                  Gain industry-grade experience by working on real client deployments and core products instead of simulated dummy tasks.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-5 text-sm">
+                <div className="space-y-2.5 pt-2 border-t border-border/40">
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Duration:</strong> 2 to 6 Months (Flexible with college schedules)</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Mentorship:</strong> 1-on-1 pairing with a senior software architect</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Tech Stack:</strong> React, Next.js, Python, LangChain, Cloud</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Outcome:</strong> Experience letter, stipend, and fast-track PPO offer</span>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => scrollToForm('careers', 'Internship')}
+                  className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs h-10"
+                >
+                  Apply for Internship
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* PATHWAY 2: FULL-TIME CAREERS */}
+            <Card className="flex flex-col justify-between border-blue-500/40 hover:border-blue-600 transition-all duration-300 shadow-lg ring-1 ring-blue-500/20 group bg-card">
+              <CardHeader className="space-y-3 pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-12 w-12 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center">
+                    <Briefcase className="h-6 w-6" />
+                  </div>
+                  <Badge className="bg-indigo-600 text-white text-xs font-medium">Core Engineering</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">Full-Time Careers</CardTitle>
+                <CardDescription className="text-xs leading-relaxed">
+                  Join our fast-paced product engineering and AI consulting teams to own critical modules and solve tough enterprise problems.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-5 text-sm">
+                <div className="space-y-2.5 pt-2 border-t border-border/40">
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Active Roles:</strong> Full-Stack, AI/ML, Cloud Data & DevOps</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Culture:</strong> High autonomy, zero bureaucracy, rapid growth</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Compensation:</strong> Competitive salary, performance bonus, and perks</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Hiring Flow:</strong> Profile Review $\rightarrow$ Tech Round $\rightarrow$ Offer in 5 days</span>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => scrollToForm('careers', 'Full-Time Job')}
+                  className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs h-10 shadow-md"
+                >
+                  Apply for Full-Time Roles
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* PATHWAY 3: BOOTCAMP LEARNING */}
+            <Card className="flex flex-col justify-between border-border/60 hover:border-cyan-600/60 transition-all duration-300 hover:shadow-xl group bg-card">
+              <CardHeader className="space-y-3 pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="h-12 w-12 rounded-xl bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 flex items-center justify-center">
+                    <Rocket className="h-6 w-6" />
+                  </div>
+                  <Badge variant="outline" className="text-xs font-medium border-cyan-500 text-cyan-600">Upskilling & Jobs</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">Bootcamp Learning</CardTitle>
+                <CardDescription className="text-xs leading-relaxed">
+                  Rigorous, industry-mapped bootcamps with 3 specialized tracks taught by working practitioners with placement support.
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="space-y-5 text-sm">
+                <div className="space-y-2.5 pt-2 border-t border-border/40">
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-cyan-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>1. Full Stack Track:</strong> MERN, Next.js, Microservices, APIs</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-cyan-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>2. Data Engineer Track:</strong> ETL/ELT, PostgreSQL, Cloud Warehousing</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-cyan-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>3. Solutions Architect Track:</strong> System Design & Scalability</span>
+                  </div>
+                  <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
+                    <Check className="h-4 w-4 text-cyan-600 flex-shrink-0 mt-0.5" />
+                    <span><strong>Format:</strong> Weekend live interactive sessions + real Capstones</span>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => scrollToForm('bootcamp', null, 'Full Stack')}
+                  className="w-full mt-4 bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs h-10"
+                >
+                  Enroll in Bootcamp
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </CardContent>
+            </Card>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          3. APPLICATION & REGISTRATION FORM (ANCHOR)
+          ======================================================== */}
+      <section ref={formSectionRef} id="apply-form" className="py-20 lg:py-28">
+        <div className="container mx-auto px-4 max-w-3xl">
+          
+          <div className="text-center mb-10 space-y-2">
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              Ready to Take the Next Step?
+            </h2>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Complete your application below. All resumes are stored securely and reviewed by our talent leads.
+            </p>
+          </div>
+
+          {/* Form Path Tabs */}
+          <div className="grid grid-cols-2 gap-3 mb-8 p-1.5 rounded-2xl bg-muted/50 border border-border/50">
             <button
               type="button"
-              onClick={() => handleTabChange('careers')}
-              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              onClick={() => { setActiveTab('careers'); setIsSuccess(false); }}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === 'careers'
                   ? 'bg-background text-foreground shadow-md border border-border/80'
                   : 'text-muted-foreground hover:text-foreground'
@@ -379,23 +622,18 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
 
             <button
               type="button"
-              onClick={() => handleTabChange('bootcamp')}
-              className={`flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${
+              onClick={() => { setActiveTab('bootcamp'); setIsSuccess(false); }}
+              className={`flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === 'bootcamp'
                   ? 'bg-background text-foreground shadow-md border border-border/80'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Rocket className="h-4 w-4 text-indigo-600" />
+              <Rocket className="h-4 w-4 text-cyan-600" />
               <span>Bootcamp Learning</span>
             </button>
           </div>
-        </div>
-      </section>
 
-      {/* 2. Main Form Container */}
-      <section className="py-12 lg:py-16">
-        <div className="container mx-auto px-4 max-w-3xl">
           {isSuccess ? (
             <Card className="border-border/60 shadow-xl text-center py-16 px-6">
               <CardContent className="space-y-6 flex flex-col items-center max-w-md mx-auto">
@@ -529,7 +767,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          placeholder="e.g. Visakhapatnam / Hyderabad"
+                          placeholder="e.g. Visakhapatnam"
                           required
                           className="h-11"
                         />
@@ -727,21 +965,6 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                             </select>
                           </div>
                         </div>
-
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-medium text-foreground/90">Preferred Learning Mode *</label>
-                          <select
-                            name="preferredMode"
-                            value={formData.preferredMode}
-                            onChange={handleInputChange}
-                            required
-                            className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="Weekend Live Sessions">Weekend Live Sessions (Interactive & Project-based)</option>
-                            <option value="Weekday Evenings">Weekday Evenings</option>
-                            <option value="Fast-Track Full-Time">Fast-Track Full-Time</option>
-                          </select>
-                        </div>
                       </div>
                     )}
                   </div>
@@ -758,7 +981,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                       <div className="space-y-2">
                         <label className="text-xs font-medium text-foreground/90 flex items-center justify-between">
                           <span>Upload Resume (PDF) *</span>
-                          <span className="text-[11px] text-muted-foreground">Saved to Google Drive</span>
+                          <span className="text-[11px] text-muted-foreground">Stored securely in Google Drive</span>
                         </label>
 
                         <input
@@ -898,39 +1121,45 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
             </Card>
           )}
 
-          {/* Program Highlights */}
-          <div className="mt-14 grid md:grid-cols-3 gap-5">
-            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-9 w-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center mb-3">
+        </div>
+      </section>
+
+      {/* ========================================================
+          4. CULTURE & PERKS HIGHLIGHTS
+          ======================================================== */}
+      <section className="py-16 bg-muted/20 border-t border-border/40">
+        <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="p-6 rounded-2xl border border-border/50 bg-card">
+              <div className="h-10 w-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center mb-4">
                 <Users className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold text-sm mb-1.5">Senior Mentorship</h4>
+              <h4 className="font-bold text-base mb-2">Senior Mentorship</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Work directly with experienced engineers on live AI, cloud, and modern web architectures.
+                Work directly alongside seasoned tech leads and domain architects who review your code and guide your technical architecture decisions.
               </p>
             </div>
 
-            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-9 w-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center mb-3">
+            <div className="p-6 rounded-2xl border border-border/50 bg-card">
+              <div className="h-10 w-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 flex items-center justify-center mb-4">
                 <Award className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold text-sm mb-1.5">PPO & Career Pathway</h4>
+              <h4 className="font-bold text-base mb-2">PPO & Fast Career Track</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                High-performing interns and bootcamp graduates are prioritized for ongoing engineering roles.
+                We believe in promoting from within. High-performing interns and bootcamp graduates are prioritized for ongoing engineering and consulting roles.
               </p>
             </div>
 
-            <div className="p-5 rounded-xl border border-border/50 bg-card/60 backdrop-blur">
-              <div className="h-9 w-9 rounded-lg bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 flex items-center justify-center mb-3">
+            <div className="p-6 rounded-2xl border border-border/50 bg-card">
+              <div className="h-10 w-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/40 text-cyan-600 flex items-center justify-center mb-4">
                 <BookOpen className="h-5 w-5" />
               </div>
-              <h4 className="font-semibold text-sm mb-1.5">Enterprise Tech Stack</h4>
+              <h4 className="font-bold text-base mb-2">Modern Enterprise Stack</h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Build real features using React, Next.js, Python, AI Agents, and scalable cloud data pipelines.
+                Gain hands-on proficiency with React, Next.js, Python, Specialized AI Agents, and robust Cloud Data pipelines deployed on modern cloud platforms.
               </p>
             </div>
           </div>
-
         </div>
       </section>
 

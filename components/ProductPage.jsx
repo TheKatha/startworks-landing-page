@@ -31,8 +31,9 @@ const LogoOrIcon = ({ product, className }) => {
   );
 };
 
-export const ProductPage = () => {
-  const { id } = useParams();
+export const ProductPage = ({ productId }) => {
+  const { id: paramId } = useParams();
+  const id = productId || paramId;
   const navigate = useNavigate();
   const product = productsContent[id];
 

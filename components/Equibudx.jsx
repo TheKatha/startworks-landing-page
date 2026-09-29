@@ -44,7 +44,11 @@ export const Equibudx = () => {
   const activeProduct = productsContent[activeId] || products[0];
 
   return (
-    <section id="equibudx" className="py-20 lg:py-32 bg-slate-50 dark:bg-[#030712] relative overflow-hidden">
+    <section id="products" className="py-20 lg:py-32 bg-slate-50 dark:bg-[#030712] relative overflow-hidden">
+      {/* Anchor targets for backwards compatibility */}
+      <div id="portfolio" className="absolute -top-24 pointer-events-none" />
+      <div id="equibudx" className="absolute -top-24 pointer-events-none" />
+      
       {/* Decorative background grid and ambient glows */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] pointer-events-none" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-blue-500/10 dark:bg-blue-600/5 blur-[120px] pointer-events-none" />

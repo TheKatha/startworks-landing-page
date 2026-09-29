@@ -60,7 +60,7 @@ export const Hero = () => {
             <Button
               size="lg"
               variant="outline"
-              onClick={() => scrollToSection('equibudx')}
+              onClick={() => scrollToSection('products')}
               className="border-border/60 hover:bg-slate-100 dark:hover:bg-slate-900 font-semibold"
             >
               <span>Explore Portfolio</span>

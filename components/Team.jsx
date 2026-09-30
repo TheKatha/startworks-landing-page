@@ -31,6 +31,32 @@ const TeamMemberAvatar = ({ avatar, name, isFounder }) => {
 };
 
 export const Team = () => {
+  const leadership = [
+    {
+      name: 'Ramesh Botta',
+      role: 'Founder',
+      avatar: 'ramesh.jpg',
+      bio: '13+ years in End-to-End BI solutions across Retail, Banking, Gaming & Digital Media. Passionate about Data Science, Data Engineering & ML.',
+      badges: [
+        { text: '✓ TDWI Certified', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+        { text: '🎯 Innovator Finalist', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' }
+      ],
+      skills: ['Data Engineering', 'ETL', 'Data Modeling', 'Advanced Analytics', 'Data Science', 'ML', 'Dashboard Design']
+    },
+    {
+      name: 'Sunny Dona Daliboina',
+      role: 'CCO',
+      avatar: 'sunny.jpg',
+      bio: '15+ years across Canara Bank & ICICI Bank driving AI Product Management, Risk Analytics & Enterprise Data Platforms. Led 37-member AI teams, unlocked ₹3,750+ Cr in business revenue, recovered ₹102 Cr in unbilled leakage, and scaled GenAI across 7,500 branches.',
+      badges: [
+        { text: '🏛️ Ex-Canara & ICICI Bank', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+        { text: '📈 ₹3,750+ Cr Revenue Impact', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },
+        { text: '🎯 ₹102 Cr Leakage Recovery', className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' }
+      ],
+      skills: ['AI Product Management', 'Revenue Optimization', 'Generative AI & LLMs', 'Credit & Risk Analytics', 'Enterprise Data Lakehouse', 'Commercial Strategy', 'Fintech & Banking', 'Cross-Functional Leadership']
+    }
+  ];
+
   const engineers = [
     {
       name: 'Hymavathi Peddimudi',
@@ -57,47 +83,52 @@ export const Team = () => {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Meet the experienced founder leading a legacy of innovation and excellence.
+            Meet the experienced leaders guiding our vision, innovation, and strategic growth.
           </p>
         </div>
 
-        {/* Founder */}
-        <div className="flex justify-center mb-16">
-          <Card className="border-border/50 hover:border-blue-600/50 transition-all duration-300 hover:shadow-lg group max-w-2xl w-full">
-            <CardContent className="py-5 px-6">
-              <div className="flex items-start gap-5">
-                {/* Avatar */}
-                <TeamMemberAvatar avatar="ramesh.jpg" name="Ramesh Botta" isFounder={true} />
+        {/* Leadership */}
+        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-16">
+          {leadership.map((leader, index) => (
+            <Card key={index} className="border-border/50 hover:border-blue-600/50 transition-all duration-300 hover:shadow-lg group w-full">
+              <CardContent className="py-5 px-6">
+                <div className="flex items-start gap-5">
+                  {/* Avatar */}
+                  <TeamMemberAvatar avatar={leader.avatar} name={leader.name} isFounder={true} />
 
-                {/* Details */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-lg font-bold">Ramesh Botta</h3>
-                    <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] px-2 py-0">
-                      Founder
-                    </Badge>
-                  </div>
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-bold">{leader.name}</h3>
+                      <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] px-2 py-0">
+                        {leader.role}
+                      </Badge>
+                    </div>
 
-                  <p className="text-xs text-muted-foreground mb-2">
-                    13+ years in End-to-End BI solutions across Retail, Banking, Gaming & Digital Media. Passionate about Data Science, Data Engineering & ML.
-                  </p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {leader.bio}
+                    </p>
 
-                  <div className="flex flex-wrap gap-1.5 mb-2">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">✓ TDWI Certified</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">🎯 Innovator Finalist</span>
-                  </div>
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {leader.badges.map((badge, bIndex) => (
+                        <span key={bIndex} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${badge.className}`}>
+                          {badge.text}
+                        </span>
+                      ))}
+                    </div>
 
-                  <div className="flex flex-wrap gap-1">
-                    {['Data Engineering', 'ETL', 'Data Modeling', 'Advanced Analytics', 'Data Science', 'ML', 'Dashboard Design'].map((skill, i) => (
-                      <span key={i} className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                        {skill}
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-1">
+                      {leader.skills.map((skill, sIndex) => (
+                        <span key={sIndex} className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Engineers Section */}

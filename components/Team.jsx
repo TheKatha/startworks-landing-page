@@ -45,9 +45,9 @@ export const Team = () => {
     },
     {
       name: 'Sunny Dona Daliboina',
-      role: 'CCO',
+      role: 'COO',
       avatar: 'sunny.jpg',
-      bio: '15+ years across Canara Bank & ICICI Bank driving AI Product Management, Risk Analytics & Enterprise Data Platforms. Led 37-member AI teams, unlocked ₹3,750+ Cr in business revenue, recovered ₹102 Cr in unbilled leakage, and scaled GenAI across 7,500 branches.',
+      bio: '16+ years across Canara Bank & ICICI Bank driving AI Product Management, Risk Analytics & Enterprise Data Platforms. Led 37-member AI teams, unlocked ₹3,750+ Cr in business revenue, recovered ₹102 Cr in unbilled leakage, and scaled GenAI across 7,500 branches.',
       badges: [
         { text: '🏛️ Ex-Canara & ICICI Bank', className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
         { text: '📈 ₹3,750+ Cr Revenue Impact', className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' },

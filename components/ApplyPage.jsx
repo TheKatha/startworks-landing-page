@@ -875,10 +875,9 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                                 required
                                 className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
+                                <option value="2028">2028</option>
                                 <option value="2027">2027</option>
                                 <option value="2026">2026</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
                                 <option value="Earlier">Earlier</option>
                               </select>
                             </div>

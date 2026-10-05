@@ -29,7 +29,7 @@ export const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: Linkedin, href: 'https://www.linkedin.com/company/equibudx/', label: 'LinkedIn' },
+    { icon: Linkedin, href: 'https://www.linkedin.com/company/startworks-technology/', label: 'LinkedIn' },
     { icon: Instagram, href: 'https://www.instagram.com/equibudx/', label: 'Instagram' },
     { icon: Youtube, href: 'https://www.youtube.com/@Equibudx', label: 'YouTube' },
     { icon: Mail, href: '#contact', label: 'Email' }

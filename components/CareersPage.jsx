@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
@@ -17,7 +17,10 @@ import {
   Check,
   ShieldCheck,
   Zap,
-  ArrowDown
+  ArrowDown,
+  Clock,
+  MapPin,
+  Bot
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { Button } from './ui/button';
@@ -37,9 +40,8 @@ export const CareersPage = ({ defaultType = 'Internship' }) => {
   const searchParams = new URLSearchParams(location.search);
   const queryType = searchParams.get('type');
   
-  const initialOpportunityType = queryType === 'job' 
-    ? 'Full-Time Job' 
-    : (defaultType === 'job' || defaultType === 'Full-Time Job' ? 'Full-Time Job' : 'Internship');
+  const isFullTimeParam = queryType === 'full-time' || queryType === 'job' || defaultType === 'full-time' || defaultType === 'job' || defaultType === 'Full-Time Job';
+  const initialOpportunityType = isFullTimeParam ? 'Full-Time Job' : 'Internship';
 
   const [opportunityType, setOpportunityType] = useState(initialOpportunityType);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,7 +51,7 @@ export const CareersPage = ({ defaultType = 'Internship' }) => {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
-    if (queryType === 'job') setOpportunityType('Full-Time Job');
+    if (queryType === 'full-time' || queryType === 'job') setOpportunityType('Full-Time Job');
     if (queryType === 'internship') setOpportunityType('Internship');
   }, [queryType]);
 
@@ -83,8 +85,11 @@ export const CareersPage = ({ defaultType = 'Internship' }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const scrollToForm = (type) => {
+  const scrollToForm = (type, role = null) => {
     setOpportunityType(type);
+    if (role) {
+      setFormData(prev => ({ ...prev, roleOrDomain: role }));
+    }
     setIsSuccess(false);
     setTimeout(() => {
       if (formSectionRef.current) {
@@ -341,7 +346,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
               </h1>
 
               <p className="text-base md:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Join our core product and AI engineering teams. From undergraduate interns building live product features to senior consultants shaping enterprise systems, we cultivate talent with deep ownership, continuous mentorship, and fast growth.
+                Join our engineering and AI teams. From students building real product features to experienced engineers solving enterprise problems, we offer opportunities to learn, build, and grow with real ownership.
               </p>
 
               <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
@@ -517,7 +522,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                 <div className="space-y-2.5 pt-2 border-t border-border/40">
                   <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
                     <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Active Roles:</strong> Full-Stack Engineer, AI/ML Specialist, Cloud Architect</span>
+                    <span><strong>Typical Roles:</strong> Full-Stack Engineer, AI/ML Specialist, Cloud Architect</span>
                   </div>
                   <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
                     <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
@@ -529,7 +534,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                   </div>
                   <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
                     <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Hiring Timeline:</strong> Profile Review $\rightarrow$ Tech Round $\rightarrow$ Offer in 3–5 days</span>
+                    <span><strong>Hiring Timeline:</strong> Profile Review → Tech Round → Offer in 3–5 days</span>
                   </div>
                 </div>
 
@@ -547,8 +552,246 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
         </div>
       </section>
 
-      {/* 3. APPLICATION FORM ANCHOR */}
-      <section ref={formSectionRef} id="apply-form" className="py-20 lg:py-28">
+      {/* 3. CURRENT JOB OPENINGS */}
+      <section id="openings" className="py-20 lg:py-24 border-b border-border/40 scroll-mt-24">
+        <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
+          <div className="max-w-2xl mx-auto text-center mb-16 space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/70 dark:bg-blue-900/30 text-xs font-bold text-blue-600 dark:text-blue-400">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>We're Hiring</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">
+              Current Openings
+            </h2>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Explore our active engineering and AI roles. Apply directly below to join our product and consulting teams.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* ROLE 1: Senior AI Engineer Intern */}
+            <Card className="flex flex-col justify-between border-border/70 hover:border-blue-600/70 transition-all duration-300 hover:shadow-xl bg-card">
+              <div>
+                <CardHeader className="space-y-3 pb-4 border-b border-border/40">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Bot className="h-6 w-6" />
+                    </div>
+                    <Badge className="bg-blue-600 text-white text-xs font-semibold">1 Position</Badge>
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold">Senior AI Engineer Intern</CardTitle>
+                    <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-blue-600" />
+                        2 Months
+                      </span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                        Hybrid
+                      </span>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-6 pt-5 text-sm">
+                  {/* Role */}
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</h4>
+                    <p className="text-sm text-foreground/90 leading-relaxed">
+                      Lead the AI development for a proof-of-concept, focusing on LLM-based information extraction, NLP, and AI pipeline design.
+                    </p>
+                  </div>
+
+                  {/* Responsibilities */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Responsibilities</h4>
+                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Design and develop AI/LLM extraction pipelines for scientific and structured documents.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Build robust prompts, schemas, validation, and verification workflows.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Evaluate model performance and iterate to improve extraction accuracy.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Experiment with LLMs, RAG architectures, embeddings, and modern AI frameworks.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Guide junior AI engineers and perform structured code & pipeline reviews.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Skills */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Skills</h4>
+                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Strong Python and AI/ML fundamentals.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Hands-on experience with LLMs and GenAI APIs.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Knowledge of NLP, RAG, embeddings, and prompt engineering.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Experience with LangChain, LlamaIndex, or similar frameworks is a plus.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Good understanding of APIs, data processing pipelines, and model evaluation.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Internship & Conversion */}
+                  <div className="p-3.5 rounded-xl bg-muted/40 border border-border/50 text-xs space-y-1.5">
+                    <p className="font-semibold text-foreground">Internship & Conversion</p>
+                    <p className="text-muted-foreground"><strong>Duration:</strong> 2 months (POC-based internship).</p>
+                    <p className="text-muted-foreground"><strong>Conversion:</strong> High performers may be converted to full-time based on project success.</p>
+                  </div>
+                </CardContent>
+              </div>
+
+              <div className="p-6 pt-0">
+                <Button 
+                  onClick={() => scrollToForm('Internship', 'Senior AI Engineer Intern')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs h-11"
+                >
+                  Apply for this Role
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </Card>
+
+            {/* ROLE 2: Junior AI Engineer Intern */}
+            <Card className="flex flex-col justify-between border-border/70 hover:border-blue-600/70 transition-all duration-300 hover:shadow-xl bg-card">
+              <div>
+                <CardHeader className="space-y-3 pb-4 border-b border-border/40">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 flex items-center justify-center flex-shrink-0">
+                      <Bot className="h-6 w-6" />
+                    </div>
+                    <Badge className="bg-blue-600 text-white text-xs font-semibold">2 Positions</Badge>
+                  </div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold">Junior AI Engineer Intern</CardTitle>
+                    <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 text-blue-600" />
+                        2 Months
+                      </span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1">
+                        <MapPin className="h-3.5 w-3.5 text-blue-600" />
+                        Hybrid
+                      </span>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="space-y-6 pt-5 text-sm">
+                  {/* Role */}
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Role</h4>
+                    <p className="text-sm text-foreground/90 leading-relaxed">
+                      Work with the AI team to develop and test AI/LLM-based solutions for information extraction and document processing.
+                    </p>
+                  </div>
+
+                  {/* Responsibilities */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Responsibilities</h4>
+                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Develop Python-based AI/NLP components and modules.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Build and test LLM prompts for structured information extraction.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Process, clean, and validate document and AI-generated datasets.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Experiment with multiple LLMs and compare extraction benchmarks.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Assist with testing, evaluation metrics, and model output refinements.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Skills */}
+                  <div className="space-y-2">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Skills</h4>
+                    <ul className="space-y-1.5 text-xs text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Good knowledge of Python programming.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Basic understanding of AI/ML and NLP concepts.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Familiarity with LLMs, GenAI APIs, and prompt engineering.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Knowledge of Pandas, NumPy, APIs, JSON, and Git/GitHub.</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-3.5 w-3.5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <span>Strong willingness to learn, experiment, and solve problems.</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Internship & Conversion */}
+                  <div className="p-3.5 rounded-xl bg-muted/40 border border-border/50 text-xs space-y-1.5">
+                    <p className="font-semibold text-foreground">Internship & Conversion</p>
+                    <p className="text-muted-foreground"><strong>Duration:</strong> 2 months (POC-based internship).</p>
+                    <p className="text-muted-foreground"><strong>Conversion:</strong> High performers may be converted to full-time based on project success.</p>
+                  </div>
+                </CardContent>
+              </div>
+
+              <div className="p-6 pt-0">
+                <Button 
+                  onClick={() => scrollToForm('Internship', 'Junior AI Engineer Intern')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs h-11"
+                >
+                  Apply for this Role
+                  <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. APPLICATION FORM ANCHOR */}
+      <section ref={formSectionRef} id="apply-form" className="py-20 lg:py-28 scroll-mt-24">
         <div className="container mx-auto px-4 max-w-3xl">
           
           <div className="text-center mb-10 space-y-2">
@@ -566,18 +809,21 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                 <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
                   <CheckCircle2 className="h-10 w-10" />
                 </div>
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold tracking-tight">Application Submitted!</h2>
+                <div className="space-y-3">
+                  <h2 className="text-2xl font-bold tracking-tight">Application Submitted Successfully</h2>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Thank you for applying. Your resume has been safely stored, and your profile is registered in our Zoho CRM. Our recruitment team will review your application and contact you soon.
+                    Thank you for applying to Startworks Technology.
+                  </p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Our recruitment team will review your application and get back to you within 2 business days if your profile is shortlisted.
                   </p>
                 </div>
                 <div className="flex gap-3 pt-4 w-full">
                   <Button onClick={() => setIsSuccess(false)} variant="outline" className="flex-1">
-                    Submit Another
+                    Submit Another Application
                   </Button>
-                  <Button onClick={() => navigate('/')} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
-                    Back to Home
+                  <Button onClick={() => { setIsSuccess(false); navigate('/careers'); }} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                    Back to Careers
                   </Button>
                 </div>
               </CardContent>
@@ -714,6 +960,8 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                           required
                           className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
+                          <option value="Senior AI Engineer Intern">Senior AI Engineer Intern</option>
+                          <option value="Junior AI Engineer Intern">Junior AI Engineer Intern</option>
                           <option value="Full-Stack Development">Full-Stack Development</option>
                           <option value="AI & Machine Learning">AI & Machine Learning</option>
                           <option value="Cloud & Data Engineering">Cloud & Data Engineering</option>
@@ -734,7 +982,8 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                             required
                             className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                           >
-                            <option value="2-3 Months">2 - 3 Months</option>
+                            <option value="2 Months">2 Months</option>
+                            <option value="3 Months">3 Months</option>
                             <option value="6 Months">6 Months</option>
                             <option value="Immediate / Long Term">Immediate / Long Term</option>
                           </select>
@@ -851,12 +1100,12 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                   <div className="space-y-4">
                     <h3 className="text-xs font-bold tracking-wider uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
-                      3. Resume (PDF) & Profiles
+                      3. Resume & Profiles
                     </h3>
 
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-foreground/90 flex items-center justify-between">
-                        <span>Upload Resume (PDF) *</span>
+                        <span>Upload Resume *</span>
                         <span className="text-[11px] text-muted-foreground">Stored securely in Google Drive</span>
                       </label>
 
@@ -889,7 +1138,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                               Click to upload or drag & drop your resume
                             </p>
                             <p className="text-xs text-muted-foreground mt-0.5">
-                              Supported format: PDF, DOC, DOCX (Max: 10MB)
+                              PDF, DOC, or DOCX • Max 10 MB
                             </p>
                           </div>
                         </div>
@@ -1033,3 +1282,4 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
   );
 };
 export default CareersPage;
+

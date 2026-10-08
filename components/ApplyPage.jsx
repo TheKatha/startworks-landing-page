@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Briefcase, 
@@ -69,7 +69,14 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
         }
       }
     }
-  }, [queryTab]);
+    if (queryType === 'full-time' || queryType === 'job') {
+      setActiveTab('careers');
+      setFormData(prev => ({ ...prev, opportunityType: 'Full-Time Job' }));
+    } else if (queryType === 'internship') {
+      setActiveTab('careers');
+      setFormData(prev => ({ ...prev, opportunityType: 'Internship' }));
+    }
+  }, [queryTab, queryType]);
 
   // Form State
   const initialFormData = {
@@ -81,7 +88,7 @@ export const ApplyPage = ({ defaultTab = 'careers' }) => {
     portfolioUrl: '',
     additionalNotes: '',
 
-    opportunityType: queryType === 'job' ? 'Full-Time Job' : (defaultTab === 'hiring' ? 'Full-Time Job' : 'Internship'),
+    opportunityType: (queryType === 'full-time' || queryType === 'job' || defaultTab === 'hiring') ? 'Full-Time Job' : 'Internship',
     roleOrDomain: 'Full-Stack Development',
     
     collegeName: '',
@@ -527,7 +534,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                   </div>
                   <div className="flex items-start gap-2.5 text-xs text-muted-foreground">
                     <Check className="h-4 w-4 text-indigo-600 flex-shrink-0 mt-0.5" />
-                    <span><strong>Hiring Flow:</strong> Profile Review $\rightarrow$ Tech Round $\rightarrow$ Offer in 5 days</span>
+                    <span><strong>Hiring Flow:</strong> Profile Review → Tech Round → Offer in 5 days</span>
                   </div>
                 </div>
 
@@ -593,7 +600,7 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
       {/* ========================================================
           3. APPLICATION & REGISTRATION FORM (ANCHOR)
           ======================================================== */}
-      <section ref={formSectionRef} id="apply-form" className="py-20 lg:py-28">
+      <section ref={formSectionRef} id="apply-form" className="py-20 lg:py-28 scroll-mt-24">
         <div className="container mx-auto px-4 max-w-3xl">
           
           <div className="text-center mb-10 space-y-2">
@@ -795,6 +802,8 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                               required
                               className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                             >
+                              <option value="Senior AI Engineer Intern">Senior AI Engineer Intern</option>
+                              <option value="Junior AI Engineer Intern">Junior AI Engineer Intern</option>
                               <option value="Full-Stack Development">Full-Stack Development</option>
                               <option value="AI & Machine Learning">AI & Machine Learning</option>
                               <option value="Cloud & Data Engineering">Cloud & Data Engineering</option>
@@ -815,7 +824,8 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
                                 required
                                 className="w-full h-11 px-3 rounded-md border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                               >
-                                <option value="2-3 Months">2 - 3 Months</option>
+                                <option value="2 Months">2 Months</option>
+                            <option value="3 Months">3 Months</option>
                                 <option value="6 Months">6 Months</option>
                                 <option value="Immediate / Long Term">Immediate / Long Term</option>
                               </select>
@@ -1166,3 +1176,4 @@ Candidate Note: ${formData.additionalNotes || 'N/A'}
   );
 };
 export default ApplyPage;
+
